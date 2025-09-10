@@ -6,46 +6,85 @@
     <title>게시판</title>
 </head>
 <body>
-    <div layout:fragment="content">
-        <section class="max-w-7xl mx-auto px-4 py-12">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold">게시판</h2>
-                <a th:href="@{/posts/new}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium">글쓰기</a>
-            </div>
+<div layout:fragment="content">
+    <section class="max-w-7xl mx-auto px-4 py-12">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold">게시판</h2>
+            <a th:href="@{/posts/new}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium">글쓰기</a>
+        </div>
 
-            <div class="overflow-x-auto bg-white shadow rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">번호</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작성일</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <!-- 게시글이 있을 때 -->
-                        <tr th:each="post, status : ${posts}" th:if="${posts != null and !posts.empty}">
-                            <td th:text="${status.count}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a th:href="@{/posts/{id}(id=${post.id})}" 
-                                   th:text="${post.title}" 
-                                   class="text-blue-600 hover:underline font-medium">
-                                    게시글 제목
-                                </a>
-                            </td>
-                            <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-01</td>
-                        </tr>
-                        
-                        <!-- 게시글이 없을 때 -->
-                        <tr th:if="${posts == null or posts.empty}">
-                            <td colspan="3" class="px-6 py-8 text-center text-gray-500">
-                                등록된 게시글이 없습니다.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </div>
+        <div class="overflow-x-auto bg-white shadow rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">번호</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작성일</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <!-- 게시글이 있을 때 -->
+                <tr th:each="post, status : ${pageResult.content}" th:if="${pageResult.content != null and !pageResult.content.empty}">
+                    <td th:text="${(pageResult.currentPage - 1) * pageResult.size + status.count}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <a th:href="@{/posts/{id}(id=${post.id})}"
+                           th:text="${post.title}"
+                           class="text-blue-600 hover:underline font-medium">
+                            게시글 제목
+                        </a>
+                    </td>
+                    <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-01</td>
+                </tr>
+
+                <!-- 게시글이 없을 때 -->
+                <tr th:if="${pageResult.content == null or pageResult.content.empty}">
+                    <td colspan="3" class="px-6 py-8 text-center text-gray-500">
+                        등록된 게시글이 없습니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div th:if="${pageResult.totalPages > 1}" class="mt-6 flex justify-center">
+            <nav class="flex space-x-2">
+                <!-- 이전 페이지 -->
+                <a th:if="${pageResult.hasPrevious()}"
+                   th:href="@{/posts(page=${pageResult.currentPage - 1}, size=${pageResult.size})}"
+                   class="px-3 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded">
+                    이전
+                </a>
+
+                <!-- 페이지 번호들 -->
+                <th:block th:each="pageNum : ${#numbers.sequence(pageResult.startPage, pageResult.endPage)}">
+                    <a th:if="${pageNum != pageResult.currentPage}"
+                       th:href="@{/posts(page=${pageNum}, size=${pageResult.size})}"
+                       th:text="${pageNum}"
+                       class="px-3 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded">
+                    </a>
+                    <span th:if="${pageNum == pageResult.currentPage}"
+                          th:text="${pageNum}"
+                          class="px-3 py-2 bg-blue-600 border border-blue-600 text-white rounded">
+                        </span>
+                </th:block>
+
+                <!-- 다음 페이지 -->
+                <a th:if="${pageResult.hasNext()}"
+                   th:href="@{/posts(page=${pageResult.currentPage + 1}, size=${pageResult.size})}"
+                   class="px-3 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded">
+                    다음
+                </a>
+            </nav>
+        </div>
+
+        <!-- 페이지 정보 -->
+        <div th:if="${pageResult.totalElements > 0}" class="mt-4 text-center text-sm text-gray-600">
+            전체 <span th:text="${pageResult.totalElements}"></span>개 게시글 중
+            <span th:text="${(pageResult.currentPage - 1) * pageResult.size + 1}"></span>-<span th:text="${pageResult.currentPage * pageResult.size > pageResult.totalElements ? pageResult.totalElements : pageResult.currentPage * pageResult.size}"></span>개 표시
+            (페이지 <span th:text="${pageResult.currentPage}"></span> / <span th:text="${pageResult.totalPages}"></span>)
+        </div>
+    </section>
+</div>
 </body>
 </html>

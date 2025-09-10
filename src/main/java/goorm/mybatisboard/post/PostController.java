@@ -1,5 +1,6 @@
 package goorm.mybatisboard.post;
 
+import goorm.mybatisboard.post.dto.PageDto;
 import goorm.mybatisboard.post.dto.PostDetailDto;
 import goorm.mybatisboard.post.dto.PostFormDto;
 import goorm.mybatisboard.post.dto.PostListDto;
@@ -28,11 +29,18 @@ public class PostController {
 
     // 게시글 목록 (기본)
     @GetMapping("/posts")
-    public String list(Model model) {
-        log.info("Accessing posts list page");
-        List<PostListDto> posts = postService.findAll();
-        log.debug("Found {} posts", posts.size());
-        model.addAttribute("posts", posts);
+    public String list(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+
+        log.info("Accessing posts list page with page={}, size={}", page, size);
+
+        PageDto<PostListDto> pageResult = postService.findAll(page, size);
+
+        log.debug("Found {} posts on page {}/{}", pageResult.getContent().size(), page, pageResult.getTotalPages());
+
+        model.addAttribute("pageResult", pageResult);
         return "post/list";
     }
 
