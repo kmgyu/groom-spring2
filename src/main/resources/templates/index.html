@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Goorm Board</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <section class="max-w-7xl mx-auto px-4 py-12 text-center">
+            <h1 class="text-4xl font-bold mb-6">Goorm Board에 오신 것을 환영합니다!</h1>
+            <p class="text-xl text-gray-600 mb-8">Spring Boot + MyBatis로 만든 게시판입니다.</p>
+            <a th:href="@{/posts}" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-lg font-medium">
+                게시판 보러가기
+            </a>
+        </section>
+    </div>
+</body>
+</html>

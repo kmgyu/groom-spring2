@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>글쓰기</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <section class="max-w-3xl mx-auto px-4 py-12">
+            <form th:action="@{${seq != null ? '/posts/' + seq : '/posts'}}" th:object="${post}" method="post" class="bg-white p-6 rounded shadow space-y-6">
+                <h1 class="text-2xl font-bold" th:text="${seq != null ? '글 수정' : '글쓰기'}">글쓰기</h1>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="title">
+                        제목 <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" th:field="*{title}" 
+                           class="w-full border rounded px-4 py-2"
+                           placeholder="제목을 입력하세요" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="content">
+                        내용 <span class="text-red-500">*</span>
+                    </label>
+                    <textarea th:field="*{content}" rows="8" 
+                              class="w-full border rounded px-4 py-2"
+                              placeholder="내용을 입력하세요"></textarea>
+                </div>
+
+                <div class="flex justify-between">
+                    <a th:href="@{/posts}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm">취소</a>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" th:text="${seq != null ? '수정' : '등록'}">등록</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</body>
+</html>
