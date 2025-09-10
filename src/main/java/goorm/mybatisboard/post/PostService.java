@@ -1,0 +1,103 @@
+package goorm.mybatisboard.post;
+
+import goorm.mybatisboard.post.dto.PostDetailDto;
+import goorm.mybatisboard.post.dto.PostFormDto;
+import goorm.mybatisboard.post.dto.PostListDto;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Slf4j
+public class PostService {
+    
+    private final PostMapper postMapper;
+    
+    public List<PostListDto> findAll() {
+        log.debug("Finding all posts");
+        List<Post> posts = postMapper.findAll();
+        log.debug("Found {} posts", posts.size());
+        return posts.stream()
+                .map(this::convertToListDto)
+                .collect(Collectors.toList());
+    }
+    
+    public PostDetailDto findBySeq(Long seq) {
+        log.debug("Finding post by seq: {}", seq);
+        Post post = postMapper.findById(seq);
+        if (post == null) {
+            log.error("Post not found with seq: {}", seq);
+            throw new RuntimeException("게시글을 찾을 수 없습니다. ID: " + seq);
+        }
+        log.debug("Found post: {} (seq: {})", post.getTitle(), seq);
+        return convertToDetailDto(post);
+    }
+    
+    @Transactional
+    public Post save(PostFormDto postFormDto) {
+        log.debug("Saving new post with title: {}", postFormDto.getTitle());
+        Post post = new Post();
+        post.setTitle(postFormDto.getTitle());
+        post.setContent(postFormDto.getContent());
+        post.setCreatedAt(LocalDateTime.now());
+        post.setUpdatedAt(LocalDateTime.now());
+        
+        postMapper.save(post);
+        log.info("Post saved successfully with title: {}", postFormDto.getTitle());
+        return post;
+    }
+    
+    @Transactional
+    public Post update(Long seq, PostFormDto postFormDto) {
+        log.debug("Updating post seq: {} with title: {}", seq, postFormDto.getTitle());
+        Post existingPost = postMapper.findById(seq);
+        if (existingPost == null) {
+            log.error("Post not found for update with seq: {}", seq);
+            throw new RuntimeException("게시글을 찾을 수 없습니다. ID: " + seq);
+        }
+        
+        Post updatePost = new Post();
+        updatePost.setTitle(postFormDto.getTitle());
+        updatePost.setContent(postFormDto.getContent());
+        updatePost.setUpdatedAt(LocalDateTime.now());
+        
+        postMapper.update(seq, updatePost);
+        log.info("Post updated successfully seq: {}, title: {}", seq, postFormDto.getTitle());
+        return postMapper.findById(seq);
+    }
+    
+    @Transactional
+    public void delete(Long seq) {
+        log.debug("Deleting post seq: {}", seq);
+        Post existingPost = postMapper.findById(seq);
+        if (existingPost == null) {
+            log.error("Post not found for deletion with seq: {}", seq);
+            throw new RuntimeException("게시글을 찾을 수 없습니다. ID: " + seq);
+        }
+        postMapper.delete(seq);
+        log.info("Post deleted successfully seq: {}, title: {}", seq, existingPost.getTitle());
+    }
+    
+    private PostListDto convertToListDto(Post post) {
+        PostListDto dto = new PostListDto();
+        dto.setId(post.getId());
+        dto.setTitle(post.getTitle());
+        dto.setCreatedAt(post.getCreatedAt());
+        return dto;
+    }
+    
+    private PostDetailDto convertToDetailDto(Post post) {
+        PostDetailDto dto = new PostDetailDto();
+        dto.setTitle(post.getTitle());
+        dto.setContent(post.getContent());
+        dto.setCreatedAt(post.getCreatedAt());
+        return dto;
+    }
+}
