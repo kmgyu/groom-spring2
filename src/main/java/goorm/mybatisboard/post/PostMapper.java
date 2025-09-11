@@ -7,11 +7,19 @@ import java.util.List;
 
 @Mapper
 public interface PostMapper {
-    List<Post> findAll(@Param("offset") int offset, @Param("size") int size);
+    List<Post> findAllWithPage(@Param("offset") int offset, @Param("size") int size);
+
+    List<Post> findAllWithSearch(@Param("offset") int offset,
+                                 @Param("size") int size,
+                                 @Param("searchType") String searchType,
+                                 @Param("keyword") String keyword);
 
     List<Post> findAll();
 
-    int countAll();
+    Integer countAll();
+
+    Integer countAllWithSearch(@Param("searchType") String searchType,
+                           @Param("keyword") String keyword);
 
     Post findById(@Param("id") Long id);
     

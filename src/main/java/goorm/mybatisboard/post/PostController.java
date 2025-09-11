@@ -32,15 +32,30 @@ public class PostController {
     public String list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String searchType,
+            @RequestParam(required = false) String keyword,
             Model model) {
 
-        log.info("Accessing posts list page with page={}, size={}", page, size);
+        log.info("Accessing posts list page with page={}, size={}, searchType={}, keyword={}",
+                page, size, searchType, keyword);
 
-        PageDto<PostListDto> pageResult = postService.findAll(page, size);
+        PageDto<PostListDto> pageResult;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            pageResult = postService.findAll(page, size, searchType, keyword);
+            log.debug("Found {} search results on page {}/{} for keyword: {}",
+            pageResult.getContent().size(), page, pageResult.getTotalPages(), keyword);
+        } else {
+            pageResult = postService.findAll(page, size);
+            log.debug("Found {} posts on page {}/{}",
+                    pageResult.getContent().size(), page, pageResult.getTotalPages());
+        }
 
         log.debug("Found {} posts on page {}/{}", pageResult.getContent().size(), page, pageResult.getTotalPages());
 
         model.addAttribute("pageResult", pageResult);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
         return "post/list";
     }
 

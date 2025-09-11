@@ -21,18 +21,40 @@ public class PostService {
     
     private final PostMapper postMapper;
 
+    public PageDto<PostListDto> findAll(int page, int size, String searchType, String keyword) {
+        log.debug("Finding posts with search options: page={}, size={}, searchType={}, keyword={}", page, size, searchType, keyword);
+
+        // data count search
+        Integer totalElements = postMapper.countAllWithSearch(searchType, keyword);
+        log.debug("Total posts count: {}", totalElements);
+
+
+        // OFFSET 계산 (페이지는 1부터 시작)
+        int offset = (page - 1) * size;
+
+        // 페이징된 데이터 조회
+        List<Post> posts = postMapper.findAllWithSearch(offset, size, searchType, keyword);
+        log.debug("Found {} posts for page {}", posts.size(), page);
+
+        List<PostListDto> postListDtos = posts.stream()
+                .map(this::convertToListDto)
+                .collect(Collectors.toList());
+
+        return PageDto.of(postListDtos, page, size, totalElements);
+    }
+
     public PageDto<PostListDto> findAll(int page, int size) {
         log.debug("Finding posts with pagination: page={}, size={}", page, size);
 
         // 전체 데이터 수 조회
-        int totalElements = postMapper.countAll();
+        Integer totalElements = postMapper.countAll();
         log.debug("Total posts count: {}", totalElements);
 
         // OFFSET 계산 (페이지는 1부터 시작)
         int offset = (page - 1) * size;
 
         // 페이징된 데이터 조회
-        List<Post> posts = postMapper.findAll(offset, size);
+        List<Post> posts = postMapper.findAllWithPage(offset, size);
         log.debug("Found {} posts for page {}", posts.size(), page);
 
         List<PostListDto> postListDtos = posts.stream()
@@ -43,6 +65,7 @@ public class PostService {
     }
 
     public List<PostListDto> findAll() {
+        // 전체 데이터 조회. 기본적으로 page 검색 기능을 사용한다.
         log.debug("Finding all posts");
         List<Post> posts = postMapper.findAll();
         log.debug("Found {} posts", posts.size());

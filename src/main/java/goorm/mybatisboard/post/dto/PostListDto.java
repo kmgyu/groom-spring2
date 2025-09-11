@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * summary of PostDTO
+ */
 @Getter
 @Setter
 @NoArgsConstructor

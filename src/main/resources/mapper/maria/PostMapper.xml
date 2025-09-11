@@ -10,6 +10,62 @@
         ORDER BY created_at DESC
     </select>
 
+    <select id="findAllWithPage" resultType="goorm.mybatisboard.post.Post">
+        SELECT id, title, content, created_at, updated_at
+        FROM posts
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="findAllWithSearch" resultType="Post">
+        SELECT id, title, content, created_at, updated_at
+        FROM posts
+        <where>
+            <if test="keyword != null and keyword.trim() != ''">
+                <choose>
+                    <when test="searchType == 'title'">
+                        LOWER(title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <when test="searchType == 'content'">
+                        LOWER(content) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <otherwise>
+                        (LOWER(title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                        OR LOWER(content) LIKE LOWER(CONCAT('%', #{keyword}, '%')))
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(id)
+        FROM posts
+    </select>
+
+    <select id="countAllWithSearch" resultType="int">
+        SELECT COUNT(id)
+        FROM posts
+        <where>
+            <if test="keyword != null and keyword.trim() != ''">
+                <choose>
+                    <when test="searchType == 'title'">
+                        LOWER(title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <when test="searchType == 'content'">
+                        LOWER(content) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <otherwise>
+                        (LOWER(title) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                        OR LOWER(content) LIKE LOWER(CONCAT('%', #{keyword}, '%')))
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </select>
+
     <select id="findById" parameterType="long" resultType="goorm.mybatisboard.post.Post">
         SELECT id, title, content, created_at, updated_at
         FROM posts
