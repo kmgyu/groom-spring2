@@ -11,4 +11,8 @@ public class PostFormDto {
     
     private String title;
     private String content;
+
+    private boolean isNotice;
+    private String authorName;
+    private Long categoryId;
 }

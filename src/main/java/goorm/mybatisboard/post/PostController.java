@@ -1,9 +1,6 @@
 package goorm.mybatisboard.post;
 
-import goorm.mybatisboard.post.dto.PageDto;
-import goorm.mybatisboard.post.dto.PostDetailDto;
-import goorm.mybatisboard.post.dto.PostFormDto;
-import goorm.mybatisboard.post.dto.PostListDto;
+import goorm.mybatisboard.post.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -59,6 +56,24 @@ public class PostController {
         return "post/list";
     }
 
+    // ========== 통합 검색 엔드포인트 ==========
+    @GetMapping("/posts/search")
+    public String searchWithConditions(SearchConditionDto condition, Model model) {
+        log.info("Accessing integrated search with conditions: {}", condition.getSummary());
+
+        PageDto<PostDetailDto> pageResult = postService.findAllWithConditions(condition);
+        List<CategoryDto> categories = postService.findActiveCategories();
+
+        log.debug("Found {} posts on page {}/{} with conditions",
+                pageResult.getContent().size(), condition.getPage(), pageResult.getTotalPages());
+
+        model.addAttribute("pageResult", pageResult);
+        model.addAttribute("condition", condition);
+        model.addAttribute("categories", categories);
+
+        return "post/search";
+    }
+
     // 게시글 상세 조회
     @GetMapping("/posts/{seq}")
     public String show(@PathVariable Long seq, Model model) {
@@ -100,6 +115,9 @@ public class PostController {
         PostFormDto formDto = new PostFormDto();
         formDto.setTitle(post.getTitle());
         formDto.setContent(post.getContent());
+        formDto.setCategoryId(post.getCategoryId());
+        formDto.setAuthorName(post.getAuthorName());
+        formDto.setNotice(post.isNotice());
         
         log.debug("Loading post for edit: {}", post.getTitle());
         model.addAttribute("post", formDto);

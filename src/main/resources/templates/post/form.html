@@ -11,6 +11,20 @@
             <form th:action="@{${seq != null ? '/posts/' + seq : '/posts'}}" th:object="${post}" method="post" class="bg-white p-6 rounded shadow space-y-6">
                 <h1 class="text-2xl font-bold" th:text="${seq != null ? '글 수정' : '글쓰기'}">글쓰기</h1>
 
+                <!-- 카테고리 선택 -->
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="categoryId">
+                        카테고리
+                    </label>
+                    <select th:field="*{categoryId}" class="w-full border rounded px-4 py-2">
+                        <option value="1">공지사항</option>
+                        <option value="2" selected>일반</option>
+                        <option value="3">질문</option>
+                        <option value="4">정보공유</option>
+                        <option value="5">자유게시판</option>
+                    </select>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium mb-1" for="title">
                         제목 <span class="text-red-500">*</span>
@@ -27,6 +41,22 @@
                     <textarea th:field="*{content}" rows="8" 
                               class="w-full border rounded px-4 py-2"
                               placeholder="내용을 입력하세요"></textarea>
+                </div>
+
+                <!-- 작성자명 -->
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="authorName">
+                        작성자명
+                    </label>
+                    <input type="text" th:field="*{authorName}"
+                           class="w-full border rounded px-4 py-2"
+                           placeholder="작성자명을 입력하세요 (기본값: 작성자)" />
+                </div>
+
+                <!-- 공지사항 여부 -->
+                <div class="flex items-center">
+                    <input type="checkbox" th:field="*{isNotice}" id="isNotice" class="mr-2" />
+                    <label for="isNotice" class="text-sm font-medium">공지사항으로 등록</label>
                 </div>
 
                 <div class="flex justify-between">

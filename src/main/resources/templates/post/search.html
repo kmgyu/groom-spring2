@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>통합 검색 - 게시판</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <section class="max-w-7xl mx-auto px-4 py-12">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold">통합 검색</h2>
+            <div class="flex gap-2">
+                <a th:href="@{/posts}" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm font-medium">기본 목록</a>
+                <a th:href="@{/posts/new}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium">글쓰기</a>
+            </div>
+        </div>
+
+        <!-- 통합 검색 폼 -->
+        <div class="mb-6 bg-gray-50 p-6 rounded-lg">
+            <form th:action="@{/posts/search}" method="get" class="space-y-4">
+                <!-- 키워드 검색 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="searchType" class="block text-sm font-medium text-gray-700 mb-1">검색 타입</label>
+                        <select name="searchType" id="searchType" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="title_content" th:selected="${condition.searchType == 'title_content' or condition.searchType == null}">제목+내용</option>
+                            <option value="title" th:selected="${condition.searchType == 'title'}">제목</option>
+                            <option value="content" th:selected="${condition.searchType == 'content'}">내용</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="keyword" class="block text-sm font-medium text-gray-700 mb-1">검색어</label>
+                        <input type="text" name="keyword" id="keyword" th:value="${condition.keyword}"
+                               placeholder="검색할 키워드를 입력하세요"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- 카테고리 필터 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+                    <div class="flex flex-wrap gap-2">
+                        <label th:each="category : ${categories}" class="inline-flex items-center">
+                            <input type="checkbox" name="categoryIds" th:value="${category.id}"
+                                   th:checked="${condition.categoryIds != null and condition.categoryIds.contains(category.id)}"
+                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span th:text="${category.name}" class="ml-2 text-sm text-gray-700"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 상태 및 기타 필터 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700 mb-1">게시 상태</label>
+                        <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="" th:selected="${condition.status == null or condition.status == ''}">전체</option>
+                            <option value="PUBLISHED" th:selected="${condition.status == 'PUBLISHED'}">게시됨</option>
+                            <option value="DRAFT" th:selected="${condition.status == 'DRAFT'}">임시저장</option>
+                            <option value="DELETED" th:selected="${condition.status == 'DELETED'}">삭제됨</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="authorName" class="block text-sm font-medium text-gray-700 mb-1">작성자</label>
+                        <input type="text" name="authorName" id="authorName" th:value="${condition.authorName}"
+                               placeholder="작성자명"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="isNotice" class="block text-sm font-medium text-gray-700 mb-1">공지사항</label>
+                        <select name="isNotice" id="isNotice" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="" th:selected="${condition.isNotice == null}">전체</option>
+                            <option value="true" th:selected="${condition.isNotice == true}">공지사항만</option>
+                            <option value="false" th:selected="${condition.isNotice == false}">일반글만</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 날짜 범위 및 정렬 -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">시작일</label>
+                        <input type="date" name="startDate" id="startDate" th:value="${condition.startDate}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">종료일</label>
+                        <input type="date" name="endDate" id="endDate" th:value="${condition.endDate}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="sortBy" class="block text-sm font-medium text-gray-700 mb-1">정렬 기준</label>
+                        <select name="sortBy" id="sortBy" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="created_at" th:selected="${condition.sortBy == 'created_at' or condition.sortBy == null}">작성일</option>
+                            <option value="title" th:selected="${condition.sortBy == 'title'}">제목</option>
+                            <option value="view_count" th:selected="${condition.sortBy == 'view_count'}">조회수</option>
+                            <option value="author_name" th:selected="${condition.sortBy == 'author_name'}">작성자</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="sortDirection" class="block text-sm font-medium text-gray-700 mb-1">정렬 방향</label>
+                        <select name="sortDirection" id="sortDirection" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="DESC" th:selected="${condition.sortDirection == 'DESC' or condition.sortDirection == null}">내림차순</option>
+                            <option value="ASC" th:selected="${condition.sortDirection == 'ASC'}">오름차순</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 페이지 크기 -->
+                <div class="flex items-end gap-4">
+                    <div>
+                        <label for="size" class="block text-sm font-medium text-gray-700 mb-1">페이지 크기</label>
+                        <select name="size" id="size" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="10" th:selected="${condition.size == 10}">10개씩</option>
+                            <option value="20" th:selected="${condition.size == 20}">20개씩</option>
+                            <option value="50" th:selected="${condition.size == 50}">50개씩</option>
+                        </select>
+                    </div>
+
+                    <!-- 검색 버튼 -->
+                    <div class="flex gap-2">
+                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            검색
+                        </button>
+                        <a th:href="@{/posts/search}" class="px-4 py-2 bg-gray-500 text-white rounded-md text-sm font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                            초기화
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- 검색 조건 요약 -->
+            <div th:if="${!condition.isEmpty()}" class="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
+                <p class="text-sm text-blue-800">
+                    <span class="font-semibold">검색 조건:</span>
+                    <span th:text="${condition.summary}"></span>
+                </p>
+            </div>
+        </div>
+
+        <!-- 검색 결과 테이블 -->
+        <div class="overflow-x-auto bg-white shadow rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">유형</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">카테고리</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작성자</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">조회수</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작성일</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <!-- 게시글이 있을 때 -->
+                <tr th:each="post, status : ${pageResult.content}" th:if="${pageResult.content != null and !pageResult.content.empty}">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span th:text="${post.noticeText}" th:class="${post.noticeClass}"></span>
+                    </td>
+                    <td th:text="${post.categoryName ?: '-'}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <a th:href="@{/posts/{id}(id=${post.id})}"
+                           th:text="${post.title}"
+                           class="text-blue-600 hover:underline font-medium">
+                        </a>
+                    </td>
+                    <td th:text="${post.authorName ?: '-'}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span th:text="${post.statusText}" th:class="${post.statusClass}"></span>
+                    </td>
+                    <td th:text="${post.viewCount ?: 0}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                    <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                </tr>
+
+                <!-- 게시글이 없을 때 -->
+                <tr th:if="${pageResult.content == null or pageResult.content.empty}">
+                    <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                        검색 조건에 맞는 게시글이 없습니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div th:if="${pageResult.totalPages > 1}" class="mt-6 flex justify-center">
+            <nav class="flex space-x-2">
+                <!-- 이전 페이지 -->
+                <a th:if="${pageResult.hasPrevious()}"
+                   th:href="@{/posts/search(page=${pageResult.currentPage - 1}, size=${condition.size}, keyword=${condition.keyword}, searchType=${condition.searchType}, categoryIds=${condition.categoryIds}, status=${condition.status}, authorName=${condition.authorName}, isNotice=${condition.isNotice}, startDate=${condition.startDate}, endDate=${condition.endDate}, sortBy=${condition.sortBy}, sortDirection=${condition.sortDirection})}"
+                   class="px-3 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded">
+                    이전
+                </a>
+
+                <!-- 페이지 번호들 -->
+                <th:block th:each="pageNum : ${#numbers.sequence(pageResult.startPage, pageResult.endPage)}">
+                    <a th:if="${pageNum != pageResult.currentPage}"
+                       th:href="@{/posts/search(page=${pageNum}, size=${condition.size}, keyword=${condition.keyword}, searchType=${condition.searchType}, categoryIds=${condition.categoryIds}, status=${condition.status}, authorName=${condition.authorName}, isNotice=${condition.isNotice}, startDate=${condition.startDate}, endDate=${condition.endDate}, sortBy=${condition.sortBy}, sortDirection=${condition.sortDirection})}"
+                       th:text="${pageNum}"
+                       class="px-3 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded">
+                    </a>
+                    <span th:if="${pageNum == pageResult.currentPage}"
+                          th:text="${pageNum}"
+                          class="px-3 py-2 bg-blue-600 border border-blue-600 text-white rounded">
+                    </span>
+                </th:block>
+
+                <!-- 다음 페이지 -->
+                <a th:if="${pageResult.hasNext()}"
+                   th:href="@{/posts/search(page=${pageResult.currentPage + 1}, size=${condition.size}, keyword=${condition.keyword}, searchType=${condition.searchType}, categoryIds=${condition.categoryIds}, status=${condition.status}, authorName=${condition.authorName}, isNotice=${condition.isNotice}, startDate=${condition.startDate}, endDate=${condition.endDate}, sortBy=${condition.sortBy}, sortDirection=${condition.sortDirection})}"
+                   class="px-3 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded">
+                    다음
+                </a>
+            </nav>
+        </div>
+
+        <!-- 페이지 정보 -->
+        <div th:if="${pageResult.totalElements > 0}" class="mt-4 text-center text-sm text-gray-600">
+            전체 <span th:text="${pageResult.totalElements}"></span>개 게시글 중
+            <span th:text="${(pageResult.currentPage - 1) * pageResult.size + 1}"></span>-<span th:text="${pageResult.currentPage * pageResult.size > pageResult.totalElements ? pageResult.totalElements : pageResult.currentPage * pageResult.size}"></span>개 표시
+            (페이지 <span th:text="${pageResult.currentPage}"></span> / <span th:text="${pageResult.totalPages}"></span>)
+        </div>
+    </section>
+</div>
+</body>
+</html>

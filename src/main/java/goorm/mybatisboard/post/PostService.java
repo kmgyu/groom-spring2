@@ -1,9 +1,6 @@
 package goorm.mybatisboard.post;
 
-import goorm.mybatisboard.post.dto.PageDto;
-import goorm.mybatisboard.post.dto.PostDetailDto;
-import goorm.mybatisboard.post.dto.PostFormDto;
-import goorm.mybatisboard.post.dto.PostListDto;
+import goorm.mybatisboard.post.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -135,6 +132,8 @@ public class PostService {
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
         dto.setCreatedAt(post.getCreatedAt());
+
+
         return dto;
     }
     
@@ -144,5 +143,35 @@ public class PostService {
         dto.setContent(post.getContent());
         dto.setCreatedAt(post.getCreatedAt());
         return dto;
+    }
+
+    // ========== 통합 검색 시스템 ==========
+
+    public PageDto<PostDetailDto> findAllWithConditions(SearchConditionDto condition) {
+        log.debug("Finding posts with integrated search conditions: {}", condition.getSummary());
+
+        condition.validateAndCorrect();
+
+        int totalElements = postMapper.countAllWithConditions(condition);
+        log.debug("Total posts count with conditions: {}", totalElements);
+
+        List<PostDetailDto> posts = postMapper.findAllWithConditions(condition);
+        log.debug("Found {} posts for page {}", posts.size(), condition.getPage());
+
+        return PageDto.of(posts, condition.getPage(), condition.getSize(), totalElements);
+    }
+
+    public List<CategoryDto> findAllCategories() {
+        log.debug("Finding all categories");
+        List<CategoryDto> categories = postMapper.findAllCategories();
+        log.debug("Found {} categories", categories.size());
+        return categories;
+    }
+
+    public List<CategoryDto> findActiveCategories() {
+        log.debug("Finding active categories");
+        List<CategoryDto> categories = postMapper.findActiveCategories();
+        log.debug("Found {} active categories", categories.size());
+        return categories;
     }
 }

@@ -17,4 +17,8 @@ public class PostListDto {
     private Long id;
     private String title;
     private LocalDateTime createdAt;
+
+    private boolean isNotice;
+    private String authorName;
+    private Long categoryId;
 }
