@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="goorm.mybatisboard.mapper.CategoryMapper">
+
+    <!-- ========== 검색 쿼리 ========== -->
+
+    <!-- 검색 조건에 따른 카테고리 목록 조회 -->
+    <select id="findAllWithConditions" parameterType="goorm.mybatisboard.post.dto.SearchConditionDto"
+            resultType="goorm.mybatisboard.post.dto.CategoryDto">
+        SELECT
+        id,
+        name,
+        description,
+        display_order,
+        is_active,
+        created_at,
+        updated_at
+        FROM categories c
+
+        <where>
+            <!-- 키워드 검색 -->
+            <if test="keyword != null and keyword.trim() != ''">
+                AND (
+                <choose>
+                    <when test="searchType == 'name'">
+                        LOWER(c.name) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <when test="searchType == 'description'">
+                        LOWER(c.description) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <otherwise>
+                        (LOWER(c.name) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                        OR LOWER(c.description) LIKE LOWER(CONCAT('%', #{keyword}, '%')))
+                    </otherwise>
+                </choose>
+                )
+            </if>
+
+            <!-- 활성 상태 필터 -->
+            <if test="isActive != null">
+                AND c.is_active = #{isActive}
+            </if>
+
+        </where>
+
+        <!-- 동적 정렬 -->
+        ORDER BY
+        <choose>
+            <when test="sortBy == 'name' and sortDirection == 'ASC'">
+                c.name ASC
+            </when>
+            <when test="sortBy == 'name' and sortDirection == 'DESC'">
+                c.name DESC
+            </when>
+            <when test="sortBy == 'created_at' and sortDirection == 'ASC'">
+                c.created_at ASC
+            </when>
+            <when test="sortBy == 'created_at' and sortDirection == 'DESC'">
+                c.created_at DESC
+            </when>
+            <when test="sortDirection == 'DESC'">
+                c.display_order DESC
+            </when>
+            <otherwise>
+                c.display_order ASC
+            </otherwise>
+        </choose>
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <!-- 검색 조건에 따른 카테고리 총 개수 -->
+    <select id="countAllWithConditions" parameterType="goorm.mybatisboard.post.dto.SearchConditionDto"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM categories c
+
+        <where>
+            <!-- 키워드 검색 -->
+            <if test="keyword != null and keyword.trim() != ''">
+                AND (
+                <choose>
+                    <when test="searchType == 'name'">
+                        LOWER(c.name) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <when test="searchType == 'description'">
+                        LOWER(c.description) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                    </when>
+                    <otherwise>
+                        (LOWER(c.name) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+                        OR LOWER(c.description) LIKE LOWER(CONCAT('%', #{keyword}, '%')))
+                    </otherwise>
+                </choose>
+                )
+            </if>
+
+            <!-- 활성 상태 필터 -->
+            <if test="isActive != null">
+                AND c.is_active = #{isActive}
+            </if>
+
+        </where>
+    </select>
+
+    <!-- ========== 기본 CRUD ========== -->
+
+    <!-- 모든 카테고리 조회 (페이징) -->
+    <select id="findAll" resultType="goorm.mybatisboard.post.dto.CategoryDto">
+        SELECT
+            id, name, description, display_order, is_active, created_at, updated_at
+        FROM categories
+        ORDER BY display_order, name
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <!-- 활성 카테고리만 조회 -->
+    <select id="findActiveCategories" resultType="goorm.mybatisboard.post.dto.CategoryDto">
+        SELECT
+            1 as id,
+            '일반' as name,
+            '일반 게시글' as description,
+            1 as display_order,
+            TRUE as is_active,
+            NOW() as created_at,
+            NOW() as updated_at
+        UNION ALL
+        SELECT
+            2 as id,
+            '공지사항' as name,
+            '중요한 공지사항' as description,
+            0 as display_order,
+            TRUE as is_active,
+            NOW() as created_at,
+            NOW() as updated_at
+        ORDER BY display_order, name
+    </select>
+
+
+    <!-- 전체 카테고리 수 -->
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM categories
+    </select>
+
+</mapper>
