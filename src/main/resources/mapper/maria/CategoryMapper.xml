@@ -117,22 +117,15 @@
     <!-- 활성 카테고리만 조회 -->
     <select id="findActiveCategories" resultType="goorm.mybatisboard.post.dto.CategoryDto">
         SELECT
-            1 as id,
-            '일반' as name,
-            '일반 게시글' as description,
-            1 as display_order,
-            TRUE as is_active,
-            NOW() as created_at,
-            NOW() as updated_at
-        UNION ALL
-        SELECT
-            2 as id,
-            '공지사항' as name,
-            '중요한 공지사항' as description,
-            0 as display_order,
-            TRUE as is_active,
-            NOW() as created_at,
-            NOW() as updated_at
+            id,
+            name,
+            description,
+            display_order,
+            is_active,
+            created_at,
+            updated_at
+        FROM categories
+        WHERE is_active = TRUE
         ORDER BY display_order, name
     </select>
 

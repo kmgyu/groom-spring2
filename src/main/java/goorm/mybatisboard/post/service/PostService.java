@@ -148,10 +148,10 @@ public class PostService {
 
     // ========== 통합 검색 시스템 ==========
 
-    public PageDto<PostDetailDto> findAllWithConditions(SearchConditionDto condition) {
-        log.debug("Finding posts with integrated search conditions: {}", condition.getSummary());
+    public PageDto<PostDetailDto> findAllWithConditions(PostSearchConditionDto condition) {
+        log.debug("Finding posts with integrated search conditions: {}", condition.toString());
 
-        condition.validateAndCorrect();
+//        condition.validateAndCorrect();
 
         int totalElements = postMapper.countAllWithConditions(condition);
         log.debug("Total posts count with conditions: {}", totalElements);

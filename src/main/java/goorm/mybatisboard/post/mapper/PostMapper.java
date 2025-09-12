@@ -2,6 +2,7 @@ package goorm.mybatisboard.post.mapper;
 
 import goorm.mybatisboard.post.dto.CategoryDto;
 import goorm.mybatisboard.post.dto.PostDetailDto;
+import goorm.mybatisboard.post.dto.PostSearchConditionDto;
 import goorm.mybatisboard.post.dto.SearchConditionDto;
 import goorm.mybatisboard.post.model.Post;
 import org.apache.ibatis.annotations.Mapper;
@@ -35,9 +36,9 @@ public interface PostMapper {
 
     // ========== 통합 검색 시스템 ==========
 
-    List<PostDetailDto> findAllWithConditions(SearchConditionDto condition);
+    List<PostDetailDto> findAllWithConditions(PostSearchConditionDto condition);
 
-    int countAllWithConditions(SearchConditionDto condition);
+    int countAllWithConditions(PostSearchConditionDto condition);
 
     // ========== 카테고리 관리 ==========
 

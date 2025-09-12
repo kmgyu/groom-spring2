@@ -59,8 +59,8 @@ public class PostController {
 
     // ========== 통합 검색 엔드포인트 ==========
     @GetMapping("/posts/search")
-    public String searchWithConditions(SearchConditionDto condition, Model model) {
-        log.info("Accessing integrated search with conditions: {}", condition.getSummary());
+    public String searchWithConditions(PostSearchConditionDto condition, Model model) {
+        log.info("Accessing integrated search with conditions: {}", condition.toString());
 
         PageDto<PostDetailDto> pageResult = postService.findAllWithConditions(condition);
         List<CategoryDto> categories = postService.findActiveCategories();

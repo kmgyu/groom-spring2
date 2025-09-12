@@ -16,7 +16,9 @@
                     <label class="block text-sm font-medium mb-1" for="categoryId">
                         카테고리
                     </label>
-                    <select th:field="*{categoryId}" class="w-full border rounded px-4 py-2">
+                    <select th:field="*{categoryId}"
+                            id="categoryId"
+                            class="w-full border rounded px-4 py-2">
                         <option value="1">공지사항</option>
                         <option value="2" selected>일반</option>
                         <option value="3">질문</option>
@@ -29,7 +31,8 @@
                     <label class="block text-sm font-medium mb-1" for="title">
                         제목 <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" th:field="*{title}" 
+                    <input type="text" th:field="*{title}"
+                           id = "title"
                            class="w-full border rounded px-4 py-2"
                            placeholder="제목을 입력하세요" />
                 </div>
@@ -38,7 +41,8 @@
                     <label class="block text-sm font-medium mb-1" for="content">
                         내용 <span class="text-red-500">*</span>
                     </label>
-                    <textarea th:field="*{content}" rows="8" 
+                    <textarea th:field="*{content}" rows="8"
+                              id="content"
                               class="w-full border rounded px-4 py-2"
                               placeholder="내용을 입력하세요"></textarea>
                 </div>
@@ -49,13 +53,14 @@
                         작성자명
                     </label>
                     <input type="text" th:field="*{authorName}"
+                           id = "authorName"
                            class="w-full border rounded px-4 py-2"
                            placeholder="작성자명을 입력하세요 (기본값: 작성자)" />
                 </div>
 
                 <!-- 공지사항 여부 -->
                 <div class="flex items-center">
-                    <input type="checkbox" th:field="*{isNotice}" id="isNotice" class="mr-2" />
+                    <input type="checkbox" th:field="*{isNotice()}" id="isNotice" class="mr-2" />
                     <label for="isNotice" class="text-sm font-medium">공지사항으로 등록</label>
                 </div>
 

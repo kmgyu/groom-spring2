@@ -175,7 +175,7 @@
                 </tr>
 
                 <!-- 게시글이 없을 때 -->
-                <tr th:if="${pageResult.content == null or pageResult.content.empty}">
+                <tr th:if="${pageResult.content == null or pageResult.content.isEmpty()}">
                     <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                         검색 조건에 맞는 게시글이 없습니다.
                     </td>

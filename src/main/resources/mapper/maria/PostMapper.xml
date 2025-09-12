@@ -100,7 +100,7 @@
     <!-- ========== 통합 검색 쿼리 ========== -->
 
     <!-- 통합 검색 - 모든 조건을 SearchConditionDto로 처리 -->
-    <select id="findAllWithConditions" parameterType="goorm.mybatisboard.post.dto.SearchConditionDto"
+    <select id="findAllWithConditions" parameterType="goorm.mybatisboard.post.dto.PostSearchConditionDto"
             resultType="goorm.mybatisboard.post.dto.PostDetailDto">
         SELECT
         p.id,
@@ -176,7 +176,7 @@
     </select>
 
     <!-- 통합 검색 카운트 -->
-    <select id="countAllWithConditions" parameterType="goorm.mybatisboard.post.dto.SearchConditionDto"
+    <select id="countAllWithConditions" parameterType="goorm.mybatisboard.post.dto.PostSearchConditionDto"
             resultType="int">
         SELECT COUNT(*)
         FROM posts p
