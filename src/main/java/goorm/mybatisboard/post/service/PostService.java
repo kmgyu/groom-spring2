@@ -135,7 +135,6 @@ public class PostService {
         dto.setTitle(post.getTitle());
         dto.setCreatedAt(post.getCreatedAt());
 
-
         return dto;
     }
     

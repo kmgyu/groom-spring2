@@ -21,4 +21,6 @@ public class PostListDto {
     private boolean isNotice;
     private String authorName;
     private Long categoryId;
+    private String categoryName;
+    private int viewCount;
 }
