@@ -1,8 +1,9 @@
-package goorm.mybatisboard.post;
+package goorm.mybatisboard.post.mapper;
 
 import goorm.mybatisboard.post.dto.CategoryDto;
 import goorm.mybatisboard.post.dto.PostDetailDto;
 import goorm.mybatisboard.post.dto.SearchConditionDto;
+import goorm.mybatisboard.post.model.Post;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

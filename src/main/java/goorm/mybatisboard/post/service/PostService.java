@@ -1,6 +1,8 @@
-package goorm.mybatisboard.post;
+package goorm.mybatisboard.post.service;
 
+import goorm.mybatisboard.post.mapper.PostMapper;
 import goorm.mybatisboard.post.dto.*;
+import goorm.mybatisboard.post.model.Post;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

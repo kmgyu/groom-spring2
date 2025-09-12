@@ -1,6 +1,7 @@
-package goorm.mybatisboard.post;
+package goorm.mybatisboard.post.controller;
 
 import goorm.mybatisboard.post.dto.*;
+import goorm.mybatisboard.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;

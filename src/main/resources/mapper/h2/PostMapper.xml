@@ -2,21 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="goorm.mybatisboard.post.PostMapper">
+<mapper namespace="goorm.mybatisboard.post.mapper.PostMapper">
 
-    <select id="findAll" resultType="goorm.mybatisboard.post.Post">
+    <select id="findAll" resultType="goorm.mybatisboard.post.model.Post">
         SELECT id, title, content, created_at, updated_at
         FROM posts
         ORDER BY created_at DESC
     </select>
 
-    <select id="findById" parameterType="long" resultType="goorm.mybatisboard.post.Post">
+    <select id="findById" parameterType="long" resultType="goorm.mybatisboard.post.model.Post">
         SELECT id, title, content, created_at, updated_at
         FROM posts
         WHERE id = #{id}
     </select>
 
-    <insert id="save" parameterType="goorm.mybatisboard.post.Post" useGeneratedKeys="true" keyProperty="id">
+    <insert id="save" parameterType="goorm.mybatisboard.post.model.Post" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO posts (title, content, created_at, updated_at)
         VALUES (#{title}, #{content}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     </insert>

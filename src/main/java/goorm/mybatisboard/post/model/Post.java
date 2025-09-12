@@ -1,4 +1,4 @@
-package goorm.mybatisboard.post;
+package goorm.mybatisboard.post.model;
 
 import lombok.*;
 

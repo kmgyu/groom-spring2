@@ -22,6 +22,7 @@ public class SearchConditionDto {
   private String status;                   // 게시글 상태 (PUBLISHED, DRAFT, DELETED)
   private String authorName;               // 작성자명
   private Boolean isNotice;                // 공지사항 여부
+  private Boolean isActive;
 
   // ========== 날짜 범위 검색 ==========
   private LocalDate startDate;             // 검색 시작일
