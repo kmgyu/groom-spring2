@@ -6,7 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class LoginDTO {
+public class SignupDto {
+
     @Email(message = "{validation.email.invalid}")
     @NotBlank(message = "{validation.email.required}")
     private String email;
@@ -18,4 +19,7 @@ public class LoginDTO {
     @Size(min=4, message = "{validation.password.size}")
     @NotBlank(message = "{validation.password.required}")
     private String password;
+
+    @NotBlank(message = "{validation.password.confirm.required}")
+    private String passwordConfirm;
 }

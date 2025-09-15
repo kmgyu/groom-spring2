@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProfileUpdateDTO {
+public class ProfileUpdateDto {
 
     @NotBlank(message = "{validation.nickname.required}")
     @Size(min = 2, max = 20, message = "{validation.nickname.size}")

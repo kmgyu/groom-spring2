@@ -1,8 +1,9 @@
 package goorm.mybatisboard.auth;
 
-import goorm.mybatisboard.auth.dto.LoginDTO;
-import goorm.mybatisboard.auth.dto.ProfileUpdateDTO;
-import goorm.mybatisboard.auth.dto.SignupDTO;
+import goorm.mybatisboard.auth.Service.UserServiceImpl;
+import goorm.mybatisboard.auth.dto.LoginDto;
+import goorm.mybatisboard.auth.dto.ProfileUpdateDto;
+import goorm.mybatisboard.auth.dto.SignupDto;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +23,17 @@ import java.util.Locale;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
     private final MessageSource messageSource;
 
     @GetMapping("/signup")
     public String signupForm(Model model) {
-        model.addAttribute("signupDTO", new SignupDTO());
+        model.addAttribute("signupDTO", new SignupDto());
         return "auth/signup";
     }
 
     @PostMapping("/signup")
-    public String signup(@Valid @ModelAttribute SignupDTO signupDTO,
+    public String signup(@Valid @ModelAttribute SignupDto signupDTO,
                          BindingResult result,
                          RedirectAttributes redirectAttributes,
                          Locale locale) {
@@ -42,7 +43,7 @@ public class AuthController {
         }
 
         try {
-            User user = userService.signup(signupDTO);
+            User user = userServiceImpl.signup(signupDTO);
             String message = messageSource.getMessage("flash.user.created", null, locale);
             redirectAttributes.addFlashAttribute("successMessage", message);
             return "redirect:/";
@@ -55,7 +56,7 @@ public class AuthController {
     // spring security가 login 진행 과정 담당
     @GetMapping("/login")
     public String loginForm(Model model) {
-        model.addAttribute("loginDTO", new LoginDTO());
+        model.addAttribute("loginDTO", new LoginDto());
         return "auth/login";
     }
 
@@ -64,10 +65,10 @@ public class AuthController {
         User user = (User) session.getAttribute("user");
 
         // 최신 사용자 정보 조회
-        User currentUser = userService.findById(user.getId());
+        User currentUser = userServiceImpl.findById(user.getId());
 
         // 프로필 DTO 생성 및 기본값 설정
-        ProfileUpdateDTO profileUpdateDto = new ProfileUpdateDTO();
+        ProfileUpdateDto profileUpdateDto = new ProfileUpdateDto();
         profileUpdateDto.setNickname(currentUser.getNickname());
 
         model.addAttribute("profileUpdateDto", profileUpdateDto);
@@ -77,7 +78,7 @@ public class AuthController {
     }
 
     @PostMapping("/profile")
-    public String updateProfile(@Valid @ModelAttribute ProfileUpdateDTO profileUpdateDto,
+    public String updateProfile(@Valid @ModelAttribute ProfileUpdateDto profileUpdateDto,
                                 BindingResult result,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes,
@@ -87,13 +88,13 @@ public class AuthController {
         User user = (User) session.getAttribute("user");
 
         if (result.hasErrors()) {
-            User currentUser = userService.findById(user.getId());
+            User currentUser = userServiceImpl.findById(user.getId());
             model.addAttribute("currentUser", currentUser);
             return "auth/profile";
         }
 
         try {
-            User updatedUser = userService.updateProfile(user.getId(), profileUpdateDto);
+            User updatedUser = userServiceImpl.updateProfile(user.getId(), profileUpdateDto);
 
             // 세션의 사용자 정보 업데이트
             session.setAttribute("user", updatedUser);
@@ -103,7 +104,7 @@ public class AuthController {
             return "redirect:/auth/profile";
         } catch (Exception e) {
             result.reject("profile.update.failed", e.getMessage());
-            User currentUser = userService.findById(user.getId());
+            User currentUser = userServiceImpl.findById(user.getId());
             model.addAttribute("currentUser", currentUser);
             return "auth/profile";
         }

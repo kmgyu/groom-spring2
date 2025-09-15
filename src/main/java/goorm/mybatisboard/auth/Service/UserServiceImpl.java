@@ -1,8 +1,10 @@
-package goorm.mybatisboard.auth;
+package goorm.mybatisboard.auth.Service;
 
-import goorm.mybatisboard.auth.dto.LoginDTO;
-import goorm.mybatisboard.auth.dto.ProfileUpdateDTO;
-import goorm.mybatisboard.auth.dto.SignupDTO;
+import goorm.mybatisboard.auth.User;
+import goorm.mybatisboard.auth.UserRepository;
+import goorm.mybatisboard.auth.dto.LoginDto;
+import goorm.mybatisboard.auth.dto.ProfileUpdateDto;
+import goorm.mybatisboard.auth.dto.SignupDto;
 import goorm.mybatisboard.auth.exception.DuplicateEmailException;
 import goorm.mybatisboard.auth.exception.InvalidCredentialsException;
 import goorm.mybatisboard.auth.exception.UserNotFoundException;
@@ -21,7 +23,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UserService implements UserDetailsService {
+public class UserServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -48,7 +50,7 @@ public class UserService implements UserDetailsService {
 //        // User 생성 및 저장...
 //    }
 
-    public User signup(SignupDTO signupDTO) {
+    public User signup(SignupDto signupDTO) {
         // 이메일 중복 검사
         if (userRepository.existsByEmail(signupDTO.getEmail())) {
             throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
@@ -72,7 +74,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public User authenticate(LoginDTO loginDTO) {
+    public User authenticate(LoginDto loginDTO) {
         log.info("로그인 시도: email={}", loginDTO.getEmail());
 
         Optional<User> userOptional = userRepository.findByEmail(loginDTO.getEmail());
@@ -98,7 +100,7 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public User updateProfile(Long userId, ProfileUpdateDTO profileUpdateDTO) {
+    public User updateProfile(Long userId, ProfileUpdateDto profileUpdateDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
