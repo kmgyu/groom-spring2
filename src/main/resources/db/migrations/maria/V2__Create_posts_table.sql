@@ -1,6 +1,6 @@
 -- MariaDB용 게시글 테이블 생성 (기존 JPA 엔티티와 호환)
 CREATE TABLE posts (
-    seq BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
     content TEXT NOT NULL,
     user_id BIGINT NOT NULL,
