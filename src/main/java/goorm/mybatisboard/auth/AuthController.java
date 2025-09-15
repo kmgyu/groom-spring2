@@ -1,5 +1,7 @@
 package goorm.mybatisboard.auth;
 
+import goorm.mybatisboard.auth.Service.MyBatisUserServiceImpl;
+import goorm.mybatisboard.auth.Service.UserService;
 import goorm.mybatisboard.auth.Service.UserServiceImpl;
 import goorm.mybatisboard.auth.dto.LoginDto;
 import goorm.mybatisboard.auth.dto.ProfileUpdateDto;
@@ -23,12 +25,13 @@ import java.util.Locale;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final UserServiceImpl userServiceImpl;
+//    private final UserServiceImpl userServiceImpl;
+    private final UserService userServiceImpl;
     private final MessageSource messageSource;
 
     @GetMapping("/signup")
     public String signupForm(Model model) {
-        model.addAttribute("signupDTO", new SignupDto());
+        model.addAttribute("signupDto", new SignupDto());
         return "auth/signup";
     }
 
@@ -56,7 +59,7 @@ public class AuthController {
     // spring security가 login 진행 과정 담당
     @GetMapping("/login")
     public String loginForm(Model model) {
-        model.addAttribute("loginDTO", new LoginDto());
+        model.addAttribute("loginDto", new LoginDto());
         return "auth/login";
     }
 

@@ -9,8 +9,10 @@ import goorm.mybatisboard.auth.exception.DuplicateEmailException;
 import goorm.mybatisboard.auth.exception.InvalidCredentialsException;
 import goorm.mybatisboard.auth.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,88 +24,125 @@ import java.util.Optional;
 @Profile("mybatis")
 @RequiredArgsConstructor
 @Transactional
-public class MyBatisUserServiceImpl implements UserService {
-    
+@Slf4j
+public class MyBatisUserServiceImpl implements UserService, UserDetailsService {
+
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    
-    public User signup(SignupDto signupDto) {
-        // 이메일 중복 검사
-        if (userMapper.existsByEmail(signupDto.getEmail())) {
-            throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
-        }
-        
-        // 비밀번호 확인 검사
-        if (!signupDto.getPassword().equals(signupDto.getPasswordConfirm())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
-        
-        // 사용자 엔티티 생성
-        User user = new User();
-        user.setEmail(signupDto.getEmail());
-        user.setPassword(passwordEncoder.encode(signupDto.getPassword())); // BCrypt 암호화
-        user.setNickname(signupDto.getNickname());
-        
-        userMapper.insert(user);
-        return user;
-    }
-    
-    @Transactional(readOnly = true)
-    public User authenticate(LoginDto loginDto) {
-        Optional<User> userOptional = userMapper.findByEmail(loginDto.getEmail());
-        
-        if (userOptional.isEmpty()) {
-            throw new InvalidCredentialsException("이메일 또는 비밀번호가 올바르지 않습니다.");
-        }
-        
-        User user = userOptional.get();
-        
-        // BCrypt 비밀번호 검증
-        if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException("이메일 또는 비밀번호가 올바르지 않습니다.");
-        }
-        
-        return user;
-    }
-    
-    public User updateProfile(Long userId, ProfileUpdateDto profileUpdateDto) {
-        User user = userMapper.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
-        
-        // 현재 비밀번호 확인 (BCrypt 비교)
-        if (!passwordEncoder.matches(profileUpdateDto.getCurrentPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException("현재 비밀번호가 일치하지 않습니다.");
-        }
-        
-        // 닉네임 업데이트
-        user.setNickname(profileUpdateDto.getNickname());
-        
-        // 새 비밀번호가 입력된 경우 비밀번호 변경
-        if (profileUpdateDto.getNewPassword() != null && !profileUpdateDto.getNewPassword().isEmpty()) {
-            // 새 비밀번호 확인 검사
-            if (!profileUpdateDto.getNewPassword().equals(profileUpdateDto.getNewPasswordConfirm())) {
-                throw new IllegalArgumentException("새 비밀번호가 일치하지 않습니다.");
-            }
-            
-            // BCrypt로 암호화하여 저장
-            user.setPassword(passwordEncoder.encode(profileUpdateDto.getNewPassword()));
-        }
-        
-        userMapper.update(user);
-        return user;
-    }
-    
-    @Transactional(readOnly = true)
-    public User findById(Long userId) {
-        return userMapper.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
-    }
-    
-    // UserDetailsService 구현 - Spring Security에서 사용
+
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userMapper.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
+        log.debug("Spring Security loadUserByUsername 호출: email={}", email);
+
+        User user = userMapper.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.warn("Spring Security - 사용자 없음: email={}", email);
+                    return new UsernameNotFoundException("User not found: " + email);
+                });
+
+        log.debug("Spring Security - 사용자 로드 성공: email={}, authorities={}",
+                email, user.getAuthorities());
+        return user;
+    }
+
+//    // 회원가입 시 비밀번호 암호화
+//    public void signup(SignupDto signupDto) {
+//        String encodedPassword = passwordEncoder.encode(signupDto.getPassword());
+//        // User 생성 및 저장...
+//    }
+
+    public User signup(SignupDto signupDTO) {
+        // 이메일 중복 검사
+        if (userMapper.existsByEmail(signupDTO.getEmail())) {
+            throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
+        }
+
+        // 비밀번호 확인 검사
+        if (!signupDTO.getPassword().equals(signupDTO.getPasswordConfirm())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 사용자 엔티티 생성
+        User user = new User();
+        user.setEmail(signupDTO.getEmail());
+        String encodedPassword = passwordEncoder.encode(signupDTO.getPassword());
+        user.setPassword(encodedPassword);
+        user.setNickname(signupDTO.getNickname());
+
+        userMapper.insert(user);
+        User savedUser = userMapper.findByEmail(user.getEmail()).orElseThrow( () -> {
+            log.warn("Spring Security - 사용자 없음: email={}", user.getEmail());
+            return new UsernameNotFoundException("User not found: " + user.getEmail());
+        });
+
+        log.info("회원가입 성공: email={}, userId={}", signupDTO.getEmail(), savedUser.getId());
+        return savedUser;
+    }
+
+    @Transactional(readOnly = true)
+    public User authenticate(LoginDto loginDTO) {
+        log.info("로그인 시도: email={}", loginDTO.getEmail());
+
+        Optional<User> userOptional = userMapper.findByEmail(loginDTO.getEmail());
+
+        if (userOptional.isEmpty()) {
+            log.warn("로그인 실패 - 사용자 없음: email={}", loginDTO.getEmail());
+            throw new InvalidCredentialsException(loginDTO.getEmail());
+        }
+
+        User user = userOptional.get();
+        log.debug("사용자 찾음: email={}, storedPasswordLength={}", user.getEmail(), user.getPassword().length());
+
+        // BCrypt 암호화된 비밀번호 검증
+        boolean passwordMatches = passwordEncoder.matches(loginDTO.getPassword(), user.getPassword());
+        log.debug("비밀번호 검증 결과: email={}, matches={}", loginDTO.getEmail(), passwordMatches);
+
+        if (!passwordMatches) {
+            log.warn("로그인 실패 - 비밀번호 불일치: email={}", loginDTO.getEmail());
+            throw new InvalidCredentialsException(loginDTO.getEmail());
+        }
+
+        log.info("로그인 성공: email={}, userId={}", loginDTO.getEmail(), user.getId());
+        return user;
+    }
+
+    public User updateProfile(Long userId, ProfileUpdateDto profileUpdateDTO) {
+        User user = userMapper.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        // 현재 비밀번호 확인 (BCrypt 비교)
+        if (!passwordEncoder.matches(profileUpdateDTO.getCurrentPassword(), user.getPassword())) {
+            throw new InvalidCredentialsException(user.getEmail());
+        }
+
+        // 닉네임 업데이트
+        user.setNickname(profileUpdateDTO.getNickname());
+
+        // 새 비밀번호가 입력된 경우 비밀번호 변경
+        if (profileUpdateDTO.getNewPassword() != null && !profileUpdateDTO.getNewPassword().isEmpty()) {
+            // 새 비밀번호 확인 검사
+            if (!profileUpdateDTO.getNewPassword().equals(profileUpdateDTO.getNewPasswordConfirm())) {
+                throw new IllegalArgumentException("Password mismatch");
+            }
+
+            // BCrypt로 암호화하여 저장
+            user.setPassword(passwordEncoder.encode(profileUpdateDTO.getNewPassword()));
+        }
+
+        userMapper.update(user);
+        User savedUser = userMapper.findById(userId).orElseThrow( () -> {
+            log.warn("Spring Security - 사용자 없음: id={}", userId);
+            return new UsernameNotFoundException("User not found: " + userId);
+        });
+
+        log.info("회원 정보 수정 성공: userId={}", userId);
+        return savedUser;
+    }
+
+    @Transactional(readOnly = true)
+    public User findById(Long userId) {
+        return userMapper.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
     }
 }

@@ -10,6 +10,8 @@ import goorm.mybatisboard.auth.exception.InvalidCredentialsException;
 import goorm.mybatisboard.auth.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +25,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Profile("jpa")
 public class UserServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -65,7 +68,7 @@ public class UserServiceImpl implements UserDetailsService {
         User user = new User();
         user.setEmail(signupDTO.getEmail());
         String encodedPassword = passwordEncoder.encode(signupDTO.getPassword());
-        user.setPassword(encodedPassword); // 평문 저장 (추후 암호화 예정)
+        user.setPassword(encodedPassword);
         user.setNickname(signupDTO.getNickname());
 
         User savedUser = userRepository.save(user);
