@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -101,8 +102,8 @@ public class PostService {
     @Transactional
     public Post update(Long seq, PostFormDto postFormDto) {
         log.debug("Updating post seq: {} with title: {}", seq, postFormDto.getTitle());
-        Post existingPost = postMapper.findById(seq);
-        if (existingPost == null) {
+        Optional<Post> existingPost = postMapper.findById(seq);
+        if (existingPost.isEmpty()) {
             log.error("Post not found for update with seq: {}", seq);
             throw new RuntimeException("게시글을 찾을 수 없습니다. ID: " + seq);
         }
@@ -114,19 +115,19 @@ public class PostService {
         
         postMapper.update(seq, updatePost);
         log.info("Post updated successfully seq: {}, title: {}", seq, postFormDto.getTitle());
-        return postMapper.findById(seq);
+        return postMapper.findById(seq).get();
     }
     
     @Transactional
     public void delete(Long seq) {
         log.debug("Deleting post seq: {}", seq);
-        Post existingPost = postMapper.findById(seq);
-        if (existingPost == null) {
+        Optional<Post> existingPost = postMapper.findById(seq);
+        if (existingPost.isEmpty()) {
             log.error("Post not found for deletion with seq: {}", seq);
             throw new RuntimeException("게시글을 찾을 수 없습니다. ID: " + seq);
         }
         postMapper.delete(seq);
-        log.info("Post deleted successfully seq: {}, title: {}", seq, existingPost.getTitle());
+        log.info("Post deleted successfully seq: {}, title: {}", seq, existingPost.get().getTitle());
     }
     
     private PostListDto convertToListDto(Post post) {

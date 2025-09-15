@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface PostMapper {
@@ -26,7 +27,7 @@ public interface PostMapper {
     Integer countAllWithSearch(@Param("searchType") String searchType,
                            @Param("keyword") String keyword);
 
-    Post findById(@Param("id") Long id);
+    Optional<Post> findById(@Param("id") Long id);
     
     void save(Post post);
     
