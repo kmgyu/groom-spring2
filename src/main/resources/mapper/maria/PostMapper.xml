@@ -67,15 +67,13 @@
     </select>
 
     <select id="findById" parameterType="long" resultType="goorm.mybatisboard.post.model.Post">
-        SELECT id, title, content, created_at, updated_at,
-               category_id, status, author_name, view_count, is_notice
+        SELECT id, title, content, created_at, updated_at, view_count
         FROM posts
         WHERE id = #{id}
     </select>
 
     <insert id="save" parameterType="goorm.mybatisboard.post.model.Post" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO posts (title, content, created_at, updated_at,
-                           category_id, status, author_name, view_count, is_notice)
+        INSERT INTO posts (title, content, created_at, updated_at)
         VALUES (#{title}, #{content}, #{createdAt}, #{updatedAt})
     </insert>
 
@@ -86,9 +84,8 @@
             updated_at = #{post.updatedAt},
             category_id = #{post.categoryId},
             status = #{post.status},
-            author_name = #{post.authorName},
+            user_id = #{post.userId},
             view_count = #{post.viewCount},
-            is_notice = #{post.isNotice}
         WHERE id = #{id}
     </update>
 
@@ -98,6 +95,7 @@
     </delete>
 
     <!-- ========== 통합 검색 쿼리 ========== -->
+    <!-- 레거시 코드. 삭제 요망-->
 
     <!-- 통합 검색 - 모든 조건을 SearchConditionDto로 처리 -->
     <select id="findAllWithConditions" parameterType="goorm.mybatisboard.post.dto.PostSearchConditionDto"

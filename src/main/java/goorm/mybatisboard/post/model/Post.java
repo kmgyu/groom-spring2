@@ -1,5 +1,7 @@
 package goorm.mybatisboard.post.model;
 
+import goorm.mybatisboard.auth.User;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -16,4 +18,6 @@ public class Post {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private long viewCount;
+    private long userId;
 }

@@ -1,7 +1,7 @@
 package goorm.mybatisboard.post.controller;
 
 import goorm.mybatisboard.post.dto.*;
-import goorm.mybatisboard.post.service.PostService;
+import goorm.mybatisboard.post.service.MyBatisPostServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 public class PostController {
 
-    private final PostService postService;
+    private final MyBatisPostServiceImpl myBatisPostServiceImpl;
 
     // 메인 페이지
     @GetMapping("/")
@@ -40,11 +40,11 @@ public class PostController {
         PageDto<PostListDto> pageResult;
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            pageResult = postService.findAll(page, size, searchType, keyword);
+            pageResult = myBatisPostServiceImpl.findAll(page, size, searchType, keyword);
             log.debug("Found {} search results on page {}/{} for keyword: {}",
             pageResult.getContent().size(), page, pageResult.getTotalPages(), keyword);
         } else {
-            pageResult = postService.findAll(page, size);
+            pageResult = myBatisPostServiceImpl.findAll(page, size);
             log.debug("Found {} posts on page {}/{}",
                     pageResult.getContent().size(), page, pageResult.getTotalPages());
         }
@@ -62,8 +62,8 @@ public class PostController {
     public String searchWithConditions(PostSearchConditionDto condition, Model model) {
         log.info("Accessing integrated search with conditions: {}", condition.toString());
 
-        PageDto<PostDetailDto> pageResult = postService.findAllWithConditions(condition);
-        List<CategoryDto> categories = postService.findActiveCategories();
+        PageDto<PostDetailDto> pageResult = myBatisPostServiceImpl.findAllWithConditions(condition);
+        List<CategoryDto> categories = myBatisPostServiceImpl.findActiveCategories();
 
         log.debug("Found {} posts on page {}/{} with conditions",
                 pageResult.getContent().size(), condition.getPage(), pageResult.getTotalPages());
@@ -79,7 +79,7 @@ public class PostController {
     @GetMapping("/posts/{seq}")
     public String show(@PathVariable Long seq, Model model) {
         log.info("Accessing post detail page for seq: {}", seq);
-        PostDetailDto post = postService.findBySeq(seq);
+        PostDetailDto post = myBatisPostServiceImpl.findBySeq(seq);
         log.debug("Found post: {}", post.getTitle());
         model.addAttribute("post", post);
         model.addAttribute("seq", seq); // 수정/삭제를 위한 seq 전달
@@ -100,7 +100,7 @@ public class PostController {
                         RedirectAttributes redirectAttributes) {
         log.info("Creating new post with title: {}", post.getTitle());
         
-        postService.save(post);
+        myBatisPostServiceImpl.save(post);
         log.info("Post created successfully: {}", post.getTitle());
         redirectAttributes.addFlashAttribute("message", "flash.post.created");
         return "redirect:/posts";
@@ -110,7 +110,7 @@ public class PostController {
     @GetMapping("/posts/{seq}/edit")
     public String editForm(@PathVariable Long seq, Model model) {
         log.info("Accessing edit form for post seq: {}", seq);
-        PostDetailDto post = postService.findBySeq(seq);
+        PostDetailDto post = myBatisPostServiceImpl.findBySeq(seq);
         
         // PostDetailDto를 PostFormDto로 변환
         PostFormDto formDto = new PostFormDto();
@@ -133,7 +133,7 @@ public class PostController {
                         RedirectAttributes redirectAttributes) {
         log.info("Updating post seq: {} with title: {}", seq, post.getTitle());
         
-        postService.update(seq, post);
+        myBatisPostServiceImpl.update(seq, post);
         log.info("Post updated successfully seq: {}", seq);
         redirectAttributes.addFlashAttribute("message", "flash.post.updated");
         return "redirect:/posts/" + seq;
@@ -143,7 +143,7 @@ public class PostController {
     @PostMapping("/posts/{seq}/delete")
     public String delete(@PathVariable Long seq, RedirectAttributes redirectAttributes) {
         log.info("Deleting post seq: {}", seq);
-        postService.delete(seq);
+        myBatisPostServiceImpl.delete(seq);
         log.info("Post deleted successfully seq: {}", seq);
         redirectAttributes.addFlashAttribute("message", "flash.post.deleted");
         return "redirect:/posts";
