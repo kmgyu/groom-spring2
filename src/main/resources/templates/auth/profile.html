@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <form th:action="@{/auth/profile}" th:object="${profileUpdateDTO}" method="post" class="space-y-6">
+        <form th:action="@{/auth/profile}" th:object="${profileUpdateDto}" method="post" class="space-y-6">
             <!-- Global Error Messages -->
             <div th:if="${#fields.hasGlobalErrors()}" class="mb-4">
                 <div th:each="error : ${#fields.globalErrors()}"

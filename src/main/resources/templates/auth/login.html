@@ -13,11 +13,15 @@
     <div class="bg-white rounded-lg shadow p-8">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">로그인</h1>
 
-        <form th:action="@{/auth/login}" th:object="${loginDTO}" method="post" class="space-y-6">
+        <form th:action="@{/auth/login}" th:object="${loginDto}" method="post" class="space-y-6">
             <!-- Login Error Message -->
             <div th:if="${param.error}" class="mb-4">
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-2">
                     <span>이메일 또는 비밀번호가 올바르지 않습니다.</span>
+                    <div th:each="msg : ${param.error}"
+                         class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-2">
+                        <span th:text="${msg}">에러 메시지</span>
+                    </div>
                 </div>
             </div>
 
