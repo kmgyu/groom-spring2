@@ -1,9 +1,5 @@
 package goorm.mybatisboard.post.mapper;
 
-import goorm.mybatisboard.post.dto.CategoryDto;
-import goorm.mybatisboard.post.dto.PostDetailDto;
-import goorm.mybatisboard.post.dto.PostSearchConditionDto;
-import goorm.mybatisboard.post.dto.SearchConditionDto;
 import goorm.mybatisboard.post.model.Post;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -35,15 +31,4 @@ public interface PostMapper {
     
     void delete(@Param("id") Long id);
 
-    // ========== 통합 검색 시스템 ==========
-
-    List<PostDetailDto> findAllWithConditions(PostSearchConditionDto condition);
-
-    int countAllWithConditions(PostSearchConditionDto condition);
-
-    // ========== 카테고리 관리 ==========
-
-    List<CategoryDto> findAllCategories();
-
-    List<CategoryDto> findActiveCategories();
 }

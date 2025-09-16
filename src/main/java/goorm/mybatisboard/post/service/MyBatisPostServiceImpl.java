@@ -164,18 +164,4 @@ public class MyBatisPostServiceImpl implements PostService{
 
         return PageDto.of(posts, condition.getPage(), condition.getSize(), totalElements);
     }
-
-    public List<CategoryDto> findAllCategories() {
-        log.debug("Finding all categories");
-        List<CategoryDto> categories = postMapper.findAllCategories();
-        log.debug("Found {} categories", categories.size());
-        return categories;
-    }
-
-    public List<CategoryDto> findActiveCategories() {
-        log.debug("Finding active categories");
-        List<CategoryDto> categories = postMapper.findActiveCategories();
-        log.debug("Found {} active categories", categories.size());
-        return categories;
-    }
 }

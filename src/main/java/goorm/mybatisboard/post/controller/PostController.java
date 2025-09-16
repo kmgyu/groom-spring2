@@ -63,14 +63,14 @@ public class PostController {
         log.info("Accessing integrated search with conditions: {}", condition.toString());
 
         PageDto<PostDetailDto> pageResult = myBatisPostServiceImpl.findAllWithConditions(condition);
-        List<CategoryDto> categories = myBatisPostServiceImpl.findActiveCategories();
+//        List<CategoryDto> categories = myBatisPostServiceImpl.findActiveCategories();
 
         log.debug("Found {} posts on page {}/{} with conditions",
                 pageResult.getContent().size(), condition.getPage(), pageResult.getTotalPages());
 
         model.addAttribute("pageResult", pageResult);
         model.addAttribute("condition", condition);
-        model.addAttribute("categories", categories);
+//        model.addAttribute("categories", categories);
 
         return "post/search";
     }
