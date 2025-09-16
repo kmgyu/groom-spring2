@@ -1,10 +1,14 @@
 package goorm.mybatisboard.common.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class BaseSearchConditionDto {
   // 공통 필드들
   protected String keyword;
