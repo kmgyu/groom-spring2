@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -51,6 +52,27 @@ public class ProductController {
     model.addAttribute("categories", categoryService.findAllActive());
     model.addAttribute("productStatuses", ProductStatus.values());
 
-    return "products/list";
+    return "product/list";
+  }
+
+  /**
+   * 상품 상세 조회
+   */
+  @GetMapping("/{productSeq}")
+  public String detail(
+          @PathVariable Long productSeq,
+          Model model
+  ) {
+    log.debug("Product detail request for seq: {}", productSeq);
+
+    try {
+      ProductDto product = productService.findById(productSeq);
+      model.addAttribute("product", product);
+      return "products/show";
+    } catch (Exception e) {
+      log.error("Failed to get product detail for seq: {}", productSeq, e);
+      model.addAttribute("errorMessage", e.getMessage());
+      return "redirect:/products";
+    }
   }
 }

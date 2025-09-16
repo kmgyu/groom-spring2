@@ -4,6 +4,7 @@ import goorm.mybatisboard.product.dto.ProductCreateDto;
 import goorm.mybatisboard.product.dto.ProductDto;
 import goorm.mybatisboard.product.dto.ProductSearchDto;
 import goorm.mybatisboard.product.dto.ProductUpdateDto;
+import goorm.mybatisboard.product.exception.ProductNotFoundException;
 import goorm.mybatisboard.product.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,7 +49,8 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   public ProductDto findById(Long productSeq) {
-    return null;
+    return productMapper.findDtoById(productSeq)
+            .orElseThrow(() -> new ProductNotFoundException(productSeq));
   }
 
   @Override
