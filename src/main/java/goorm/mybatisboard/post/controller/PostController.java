@@ -57,23 +57,23 @@ public class PostController {
         return "post/list";
     }
 
-    // ========== 통합 검색 엔드포인트 ==========
-    @GetMapping("/posts/search")
-    public String searchWithConditions(PostSearchConditionDto condition, Model model) {
-        log.info("Accessing integrated search with conditions: {}", condition.toString());
-
-        PageDto<PostDetailDto> pageResult = myBatisPostServiceImpl.findAllWithConditions(condition);
-//        List<CategoryDto> categories = myBatisPostServiceImpl.findActiveCategories();
-
-        log.debug("Found {} posts on page {}/{} with conditions",
-                pageResult.getContent().size(), condition.getPage(), pageResult.getTotalPages());
-
-        model.addAttribute("pageResult", pageResult);
-        model.addAttribute("condition", condition);
-//        model.addAttribute("categories", categories);
-
-        return "post/search";
-    }
+//    // ========== 통합 검색 엔드포인트 ==========
+//    @GetMapping("/posts/search")
+//    public String searchWithConditions(PostSearchConditionDto condition, Model model) {
+//        log.info("Accessing integrated search with conditions: {}", condition.toString());
+//
+//        PageDto<PostDetailDto> pageResult = myBatisPostServiceImpl.findAllWithConditions(condition);
+////        List<CategoryDto> categories = myBatisPostServiceImpl.findActiveCategories();
+//
+//        log.debug("Found {} posts on page {}/{} with conditions",
+//                pageResult.getContent().size(), condition.getPage(), pageResult.getTotalPages());
+//
+//        model.addAttribute("pageResult", pageResult);
+//        model.addAttribute("condition", condition);
+////        model.addAttribute("categories", categories);
+//
+//        return "post/search";
+//    }
 
     // 게시글 상세 조회
     @GetMapping("/posts/{seq}")
