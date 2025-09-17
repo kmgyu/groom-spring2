@@ -1,104 +1,171 @@
-# 데이터베이스 마이그레이션 가이드
+# Database Schema Documentation
 
-## 마이그레이션 실행 순서
+## 테이블 구조 개요
 
-Flyway는 파일명 순서대로 마이그레이션을 실행합니다:
+이 디렉토리는 MariaDB용 Flyway 마이그레이션 파일들을 포함합니다.
 
-### 1. 테이블 생성 (DDL)
-- `V1__Create_users_table.sql` - 사용자 테이블 생성
-- `V2__Create_posts_table.sql` - 게시글 테이블 생성 (users 외래키 참조)
-- `V0_2__Add_updated_at_to_posts.sql` - posts 테이블에 updated_at 컬럼 추가
-- `V3__Create_products_table.sql` - 상품 테이블 생성
-- `V4__Create_orders_table.sql` - 주문 테이블 생성 (users 외래키 참조)
-- `V5__Create_order_items_table.sql` - 주문상품 테이블 생성 (orders, products 외래키 참조)
-- `V6__Create_inventory_logs_table.sql` - 재고변동로그 테이블 생성 (products, users 외래키 참조)
+## 마이그레이션 순서
 
-### 2. 샘플 데이터 삽입 (DML)
-- `V7__Insert_sample_data.sql` - 사용자 샘플 데이터 삽입
-- `V8__Insert_basic_sample_data.sql` - 게시글 샘플 데이터 삽입
+| 순서 | 파일명 | 테이블명 | 설명 |
+|------|--------|----------|------|
+| V1   | Create_users_table.sql | users | 사용자 정보 |
+| V2   | Create_posts_table.sql | posts | 게시글 정보 |
+| V3   | Create_categories_table.sql | categories | 상품 카테고리 |
+| V4   | Create_suppliers_table.sql | suppliers | 공급업체 |
+| V5   | Create_products_table.sql | products | 상품 정보 |
+| V6   | Create_inventory_table.sql | inventory | 재고 관리 |
+| V7   | Create_stock_movements_table.sql | stock_movements | 재고 이동 이력 |
+| V8   | Create_customers_table.sql | customers | 고객 정보 |
+| V9   | Create_orders_table.sql | orders | 주문 정보 |
+| V10  | Create_order_items_table.sql | order_items | 주문 상품 상세 |
+| V11  | Create_discounts_table.sql | discounts | 할인 정책 |
+| V12  | Create_discount_rules_table.sql | discount_rules | 할인 적용 규칙 |
 
-## 테이블 의존성 관계
+## 테이블별 상세 명세
 
-```
-users (기본)
-  ├── posts (user_id → users.id)
-  ├── orders (user_id → users.id)
-  └── inventory_logs (created_by → users.id)
+### 1. users (사용자)
+- **PK**: user_seq
+- **주요 컬럼**: email, password, nickname
+- **특징**: Spring Security UserDetails 구현체와 매핑
 
-products (독립)
-  ├── order_items (product_id → products.id)
-  └── inventory_logs (product_id → products.id)
+### 2. posts (게시글)
+- **PK**: seq
+- **FK**: user_seq → users.user_seq
+- **주요 컬럼**: title, content, view_count
+- **특징**: 게시판 시스템의 핵심 테이블
 
-orders (users 의존)
-  └── order_items (order_id → orders.id)
-```
+### 3. categories (상품 카테고리)
+- **PK**: category_seq
+- **FK**: parent_category_seq → categories.category_seq (Self Reference)
+- **주요 컬럼**: name, description, sort_order
+- **특징**: 계층형 카테고리 구조 지원
 
-## 테이블 삭제 순서 (역순)
+### 4. suppliers (공급업체)
+- **PK**: supplier_seq
+- **주요 컬럼**: name, contact_person, email, phone, address
+- **특징**: 상품 공급업체 관리
 
-외래키 관계 때문에 다음 순서로 삭제해야 합니다:
+### 5. products (상품)
+- **PK**: product_seq
+- **FK**:
+  - category_seq → categories.category_seq
+  - supplier_seq → suppliers.supplier_seq
+- **주요 컬럼**: code, name, unit_price, unit_cost, sku, barcode
+- **특징**: 재고 관리 시스템의 핵심 상품 정보
+
+### 6. inventory (재고)
+- **PK**: inventory_seq
+- **FK**: product_seq → products.product_seq
+- **주요 컬럼**: current_stock, reserved_stock, available_stock (계산 컬럼)
+- **특징**: 실시간 재고 수량 관리
+
+### 7. stock_movements (재고 이동 이력)
+- **PK**: stock_movement_seq
+- **FK**:
+  - product_seq → products.product_seq
+  - user_id → users.user_seq
+- **주요 컬럼**: movement_type, quantity, reference_type
+- **특징**: 모든 재고 변동 이력 추적
+
+### 8. customers (고객)
+- **PK**: customer_seq
+- **주요 컬럼**: customer_code, name, email, company, customer_type
+- **특징**: 개인/기업 고객 구분 관리
+
+### 9. orders (주문)
+- **PK**: order_seq
+- **FK**:
+  - customer_seq → customers.customer_seq
+  - user_id → users.user_seq
+- **주요 컬럼**: order_number, status, total_amount, payment_status
+- **특징**: 주문 헤더 정보
+
+### 10. order_items (주문 상품 상세)
+- **PK**: order_item_seq
+- **FK**:
+  - order_seq → orders.order_seq
+  - product_seq → products.product_seq
+- **주요 컬럼**: quantity, unit_price, total_amount
+- **특징**: 주문별 상품 상세 정보
+
+### 11. discounts (할인 정책)
+- **PK**: discount_seq
+- **주요 컬럼**: name, discount_type, discount_value, start_date, end_date
+- **특징**: 퍼센트/고정금액 할인 지원
+
+### 12. discount_rules (할인 적용 규칙)
+- **PK**: discount_rule_seq
+- **FK**: discount_seq → discounts.discount_seq
+- **주요 컬럼**: target_type, target_id
+- **특징**: 카테고리/상품/고객별 할인 적용 규칙
+
+## 명명 규칙
+
+- **PK 컬럼**: `테이블명_seq` (단, posts는 `seq`)
+- **FK 컬럼**: `참조테이블명_seq`
+- **인덱스**: `idx_테이블명_컬럼명`
+- **제약조건**: `fk_테이블명_참조테이블명_seq`
+
+## 테이블 삭제 쿼리 (역순)
 
 ```sql
--- 1. 데이터 삭제 (외래키 참조가 있는 테이블부터)
-DROP TABLE IF EXISTS inventory_logs;
-DROP TABLE IF EXISTS order_items;
-DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS posts;
+-- 외래키 의존성을 고려한 삭제 순서
 
--- 2. 독립 테이블 삭제
+-- 12. discount_rules (할인 규칙)
+DROP TABLE IF EXISTS discount_rules;
+
+-- 11. discounts (할인)
+DROP TABLE IF EXISTS discounts;
+
+-- 10. order_items (주문 상품)
+DROP TABLE IF EXISTS order_items;
+
+-- 9. orders (주문)
+DROP TABLE IF EXISTS orders;
+
+-- 8. customers (고객)
+DROP TABLE IF EXISTS customers;
+
+-- 7. stock_movements (재고 이동 이력)
+DROP TABLE IF EXISTS stock_movements;
+
+-- 6. inventory (재고)
+DROP TABLE IF EXISTS inventory;
+
+-- 5. products (상품)
 DROP TABLE IF EXISTS products;
 
--- 3. 기본 테이블 삭제
-DROP TABLE IF EXISTS users;
+-- 4. suppliers (공급업체)
+DROP TABLE IF EXISTS suppliers;
 
--- 4. Flyway 히스토리 삭제 (필요시)
-DROP TABLE IF EXISTS flyway_schema_history;
-```
+-- 3. categories (카테고리)
+DROP TABLE IF EXISTS categories;
 
-## 개발 시 유용한 명령어
-
-### 전체 테이블 초기화
-```sql
--- 모든 테이블 삭제 (위 순서대로)
-DROP TABLE IF EXISTS inventory_logs;
-DROP TABLE IF EXISTS order_items;
-DROP TABLE IF EXISTS orders;
+-- 2. posts (게시글)
 DROP TABLE IF EXISTS posts;
-DROP TABLE IF EXISTS products;
+
+-- 1. users (사용자)
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS flyway_schema_history;
 ```
 
-### Flyway 명령어
+## 개발 참고사항
+
+1. **Character Set**: 모든 테이블은 `utf8mb4` 사용
+2. **Collation**: `utf8mb4_unicode_ci` 사용
+3. **Engine**: InnoDB 사용
+4. **Timestamp**: 자동 관리 (`created_at`, `updated_at`)
+5. **Flyway 설정**: `baseline-on-migrate: true` 적용
+
+## 데이터베이스 초기화
+
+전체 스키마를 초기화하려면 위의 DROP TABLE 쿼리를 순서대로 실행한 후,
+Flyway를 다시 실행하면 됩니다.
+
 ```bash
-# 마이그레이션 정보 확인
-./gradlew flywayInfo
-
-# 마이그레이션 실행
+# Flyway 마이그레이션 실행
 ./gradlew flywayMigrate
-
-# 데이터베이스 클린 (모든 객체 삭제)
-./gradlew flywayClean
-
-# 검증
-./gradlew flywayValidate
 ```
 
-## 주의사항
 
-1. **외래키 제약조건**: 테이블 삭제 시 반드시 참조하는 테이블부터 삭제
-2. **데이터 백업**: 운영 환경에서는 삭제 전 반드시 데이터 백업
-3. **트랜잭션**: 여러 테이블 작업 시 트랜잭션 처리 권장
-4. **Flyway Clean**: `clean-disabled: false` 설정이 있어야 사용 가능
-
-## 샘플 데이터
-
-### 사용자 (V5)
-- admin@example.com (관리자)
-- user1@example.com (사용자1)
-- user2@example.com (사용자2)
-- test@example.com (테스트유저)
-- **공통 비밀번호**: password123
-
-### 게시글 (V6)
-- 7개의 기술 관련 게시글
-- 각 사용자별로 작성된 샘플 게시글
+테스트용 관리자 계정 정보
+admin@test.com / 1234
