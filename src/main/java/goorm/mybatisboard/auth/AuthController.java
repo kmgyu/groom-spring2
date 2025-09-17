@@ -68,7 +68,7 @@ public class AuthController {
         User user = (User) session.getAttribute("user");
 
         // 최신 사용자 정보 조회
-        User currentUser = userServiceImpl.findById(user.getId());
+        User currentUser = userServiceImpl.findById(user.getUserSeq());
 
         // 프로필 DTO 생성 및 기본값 설정
         ProfileUpdateDto profileUpdateDto = new ProfileUpdateDto();
@@ -91,13 +91,13 @@ public class AuthController {
         User user = (User) session.getAttribute("user");
 
         if (result.hasErrors()) {
-            User currentUser = userServiceImpl.findById(user.getId());
+            User currentUser = userServiceImpl.findById(user.getUserSeq());
             model.addAttribute("currentUser", currentUser);
             return "auth/profile";
         }
 
         try {
-            User updatedUser = userServiceImpl.updateProfile(user.getId(), profileUpdateDto);
+            User updatedUser = userServiceImpl.updateProfile(user.getUserSeq(), profileUpdateDto);
 
             // 세션의 사용자 정보 업데이트
             session.setAttribute("user", updatedUser);
@@ -107,7 +107,7 @@ public class AuthController {
             return "redirect:/auth/profile";
         } catch (Exception e) {
             result.reject("profile.update.failed", e.getMessage());
-            User currentUser = userServiceImpl.findById(user.getId());
+            User currentUser = userServiceImpl.findById(user.getUserSeq());
             model.addAttribute("currentUser", currentUser);
             return "auth/profile";
         }
