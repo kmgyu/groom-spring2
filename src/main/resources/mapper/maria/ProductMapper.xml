@@ -23,6 +23,8 @@
         <result property="status" column="status"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
+        <result property="createdSeq" column="created_seq"/>
+        <result property="updatedSeq" column="updated_seq"/>
     </resultMap>
 
     <!-- DTO Result Map -->
@@ -46,6 +48,8 @@
         <result property="status" column="status"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
+        <result property="createdSeq" column="created_seq"/>
+        <result property="updatedSeq" column="updated_seq"/>
     </resultMap>
 
     <!-- 공통 컬럼 -->
@@ -67,13 +71,15 @@
         p.status,
         p.created_at,
         p.updated_at
+        p.created_seq,
+        p.updated_seq
     </sql>
 
     <!-- DTO용 컬럼 (조인 정보 포함) -->
     <sql id="productDtoColumns">
         <include refid="productColumns"/>,
-        NULL as category_name,
-        NULL as supplier_name
+        c.name as category_name,
+        s.name as supplier_name
     </sql>
 
     <!-- 검색 조건 -->
@@ -143,11 +149,11 @@
         INSERT INTO products (
             code, name, description, category_seq, supplier_seq,
             unit_price, unit_cost, unit, sku, barcode,
-            weight, dimensions, image_url, status
+            weight, dimensions, image_url, status, created_seq, updated_seq
         ) VALUES (
             #{code}, #{name}, #{description}, #{categorySeq}, #{supplierSeq},
             #{unitPrice}, #{unitCost}, #{unit}, #{sku}, #{barcode},
-            #{weight}, #{dimensions}, #{imageUrl}, #{status}
+            #{weight}, #{dimensions}, #{imageUrl}, #{status}, #{createdSeq}, #{updatedSeq}
         )
     </insert>
 
@@ -167,7 +173,8 @@
             weight = #{weight},
             dimensions = #{dimensions},
             image_url = #{imageUrl},
-            status = #{status}
+            status = #{status},
+            updated_seq = #{updatedSeq}
         WHERE product_seq = #{productSeq}
     </update>
 
@@ -194,6 +201,8 @@
     <select id="findDtoById" resultMap="productDtoResultMap">
         SELECT <include refid="productDtoColumns"/>
         FROM products p
+        LEFT JOIN categories c ON p.category_seq = c.category_seq
+        LEFT JOIN suppliers s ON p.supplier_seq = s.supplier_seq
         WHERE p.product_seq = #{productSeq}
     </select>
 
@@ -201,6 +210,8 @@
     <select id="findAll" resultMap="productDtoResultMap">
         SELECT <include refid="productDtoColumns"/>
         FROM products p
+        LEFT JOIN categories c ON p.category_seq = c.category_seq
+        LEFT JOIN suppliers s ON p.supplier_seq = s.supplier_seq
         <include refid="searchConditions"/>
         <include refid="orderBy"/>
         LIMIT #{search.offset}, #{search.size}
@@ -245,6 +256,8 @@
     <select id="findByStatus" resultMap="productDtoResultMap">
         SELECT <include refid="productDtoColumns"/>
         FROM products p
+        LEFT JOIN categories c ON p.category_seq = c.category_seq
+        LEFT JOIN suppliers s ON p.supplier_seq = s.supplier_seq
         WHERE p.status = #{status}
         ORDER BY p.created_at DESC
     </select>
@@ -253,6 +266,8 @@
     <select id="findSellableProducts" resultMap="productDtoResultMap">
         SELECT <include refid="productDtoColumns"/>
         FROM products p
+        LEFT JOIN categories c ON p.category_seq = c.category_seq
+        LEFT JOIN suppliers s ON p.supplier_seq = s.supplier_seq
         WHERE p.status = 'ACTIVE'
         ORDER BY p.created_at DESC
     </select>
@@ -261,6 +276,8 @@
     <select id="findRecentProducts" resultMap="productDtoResultMap">
         SELECT <include refid="productDtoColumns"/>
         FROM products p
+        LEFT JOIN categories c ON p.category_seq = c.category_seq
+        LEFT JOIN suppliers s ON p.supplier_seq = s.supplier_seq
         ORDER BY p.created_at DESC
         LIMIT #{limit}
     </select>

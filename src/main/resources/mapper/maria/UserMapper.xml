@@ -7,7 +7,7 @@
 
     <!-- 공통 컬럼 리스트 -->
     <sql id="userColumns">
-        id,
+        user_seq,
         email,
         password,
         nickname,
@@ -28,7 +28,7 @@
         SELECT
         <include refid="userColumns"/>
         FROM users
-        WHERE id = #{id}
+        WHERE user_seq = #{id}
     </select>
 
     <!-- 이메일 존재 여부 -->
@@ -52,12 +52,12 @@
             password = #{password},
             nickname = #{nickname},
             updated_at = NOW()
-        WHERE id = #{id}
+        WHERE user_seq = #{id}
     </update>
 
     <!-- 삭제 -->
     <delete id="deleteById" parameterType="long">
-        DELETE FROM users WHERE id = #{id}
+        DELETE FROM users WHERE user_seq = #{id}
     </delete>
 
 </mapper>

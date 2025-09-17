@@ -5,20 +5,20 @@
 <mapper namespace="goorm.mybatisboard.post.mapper.PostMapper">
 
     <select id="findAll" resultType="goorm.mybatisboard.post.model.Post">
-        SELECT id, title, content, created_at, updated_at
+        SELECT seq, title, content, created_at, updated_at
         FROM posts
         ORDER BY created_at DESC
     </select>
 
     <select id="findAllWithPage" resultType="goorm.mybatisboard.post.model.Post">
-        SELECT id, title, content, created_at, updated_at
+        SELECT seq, title, content, created_at, updated_at
         FROM posts
         ORDER BY created_at DESC
         LIMIT #{offset}, #{size}
     </select>
 
     <select id="findAllWithSearch" resultType="Post">
-        SELECT id, title, content, created_at, updated_at
+        SELECT seq, title, content, created_at, updated_at
         FROM posts
         <where>
             <if test="keyword != null and keyword.trim() != ''">
@@ -41,12 +41,12 @@
     </select>
 
     <select id="countAll" resultType="int">
-        SELECT COUNT(id)
+        SELECT COUNT(seq)
         FROM posts
     </select>
 
     <select id="countAllWithSearch" resultType="int">
-        SELECT COUNT(id)
+        SELECT COUNT(seq)
         FROM posts
         <where>
             <if test="keyword != null and keyword.trim() != ''">
@@ -67,9 +67,9 @@
     </select>
 
     <select id="findById" parameterType="long" resultType="goorm.mybatisboard.post.model.Post">
-        SELECT id, title, content, created_at, updated_at, view_count
+        SELECT seq, title, content, created_at, updated_at, view_count
         FROM posts
-        WHERE id = #{id}
+        WHERE seq = #{id}
     </select>
 
     <insert id="save" parameterType="goorm.mybatisboard.post.model.Post" useGeneratedKeys="true" keyProperty="id">
@@ -86,12 +86,12 @@
             status = #{post.status},
             user_id = #{post.userId},
             view_count = #{post.viewCount},
-        WHERE id = #{id}
+        WHERE id = #{seq}
     </update>
 
     <delete id="delete" parameterType="long">
         DELETE FROM posts 
-        WHERE id = #{id}
+        WHERE id = #{seq}
     </delete>
 
 </mapper>
