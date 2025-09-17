@@ -76,7 +76,7 @@ public class MyBatisUserServiceImpl implements UserService, UserDetailsService {
             return new UsernameNotFoundException("User not found: " + user.getEmail());
         });
 
-        log.info("회원가입 성공: email={}, userId={}", signupDTO.getEmail(), savedUser.getId());
+        log.info("회원가입 성공: email={}, userId={}", signupDTO.getEmail(), savedUser.getUserSeq());
         return savedUser;
     }
 
@@ -103,7 +103,7 @@ public class MyBatisUserServiceImpl implements UserService, UserDetailsService {
             throw new InvalidCredentialsException(loginDTO.getEmail());
         }
 
-        log.info("로그인 성공: email={}, userId={}", loginDTO.getEmail(), user.getId());
+        log.info("로그인 성공: email={}, userId={}", loginDTO.getEmail(), user.getUserSeq());
         return user;
     }
 

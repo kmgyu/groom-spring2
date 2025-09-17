@@ -134,7 +134,7 @@ public class MyBatisPostServiceImpl implements PostService{
     
     private PostListDto convertToListDto(Post post) {
         PostListDto dto = new PostListDto();
-        dto.setId(post.getId());
+        dto.setId(post.getSeq());
         dto.setTitle(post.getTitle());
         dto.setCreatedAt(post.getCreatedAt());
 
