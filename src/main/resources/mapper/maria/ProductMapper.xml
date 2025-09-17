@@ -70,7 +70,7 @@
         p.image_url,
         p.status,
         p.created_at,
-        p.updated_at
+        p.updated_at,
         p.created_seq,
         p.updated_seq
     </sql>
