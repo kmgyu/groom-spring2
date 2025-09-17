@@ -61,12 +61,15 @@ public class ProductUpdateDto {
 
     private ProductStatus status;
 
+    private Long updatedSeq;
+
     private String currentImageUrl;
 
     // 파일 업로드용 필드
     private MultipartFile imageFile;
 
     // 이미지 삭제 여부
+    @Builder.Default
     private Boolean deleteImage = false;
 
     /**

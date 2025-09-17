@@ -1,22 +1,26 @@
 package goorm.mybatisboard.product;
 
 import goorm.mybatisboard.auth.security.LoginFailureHandler;
+import goorm.mybatisboard.product.dto.ProductCreateDto;
 import goorm.mybatisboard.product.dto.ProductDto;
 import goorm.mybatisboard.product.dto.ProductSearchDto;
+import goorm.mybatisboard.product.dto.ProductUpdateDto;
 import goorm.mybatisboard.product.service.CategoryService;
 import goorm.mybatisboard.product.service.ProductService;
 import goorm.mybatisboard.product.service.SupplierService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,7 +32,6 @@ public class ProductController {
   private final SupplierService supplierService;
   private final MessageSource messageSource;
   private final LocaleResolver localeResolver;
-//  private final LoginFailureHandler loginFailureHandler;
 
   /**
    * 상품 목록 조회
@@ -56,6 +59,86 @@ public class ProductController {
   }
 
   /**
+   * 상품 등록 폼
+   */
+  @GetMapping("/new")
+  public String createForm(Model model) {
+    model.addAttribute("product", new ProductCreateDto());
+    model.addAttribute("categories", categoryService.findAllActive());
+    model.addAttribute("suppliers", supplierService.findAllActive());
+    return "product/form";
+  }
+
+  /**
+   * 상품 등록 처리
+   */
+  @PostMapping
+  public String create(
+          @Valid @ModelAttribute("product") ProductCreateDto createDto,
+          BindingResult bindingResult,
+          RedirectAttributes redirectAttributes,
+          Model model,
+          HttpServletRequest request
+  ) {
+    log.debug("상품 등록 요청: {}", createDto);
+
+    if (bindingResult.hasErrors()) {
+      model.addAttribute("categories", categoryService.findAllActive());
+      model.addAttribute("suppliers", supplierService.findAllActive());
+      return "product/form";
+    }
+
+    try {
+      ProductDto savedProduct = productService.create(createDto);
+      String message = messageSource.getMessage("product.message.create.success", null, localeResolver.resolveLocale(request));
+      redirectAttributes.addFlashAttribute("successMessage", message);
+      return "redirect:/products/" + savedProduct.getProductSeq();
+    } catch (Exception e) {
+      log.error("상품 등록 실패", e);
+      model.addAttribute("errorMessage", e.getMessage());
+      model.addAttribute("categories", categoryService.findAllActive());
+      model.addAttribute("suppliers", supplierService.findAllActive());
+      return "product/form";
+    }
+  }
+
+  /**
+   * 상품 수정 처리
+   */
+  @PostMapping("/{productSeq}")
+  public String update(
+          @PathVariable Long productSeq,
+          @Valid @ModelAttribute("product") ProductUpdateDto updateDto,
+          BindingResult bindingResult,
+          RedirectAttributes redirectAttributes,
+          Model model,
+          HttpServletRequest request
+  ) {
+    log.debug("상품 수정 요청 seq: {}", productSeq);
+
+    updateDto.setProductSeq(productSeq);
+
+    if (bindingResult.hasErrors()) {
+      model.addAttribute("categories", categoryService.findAllActiveOrSelected(updateDto.getCategorySeq()));
+      model.addAttribute("suppliers", supplierService.findAllActiveOrSelected(updateDto.getSupplierSeq()));
+      return "product/form";
+    }
+
+    try {
+      ProductDto updatedProduct = productService.update(updateDto);
+      String message = messageSource.getMessage("product.message.update.success", null, localeResolver.resolveLocale(request));
+      redirectAttributes.addFlashAttribute("successMessage", message);
+      return "redirect:/products/" + updatedProduct.getProductSeq();
+    } catch (Exception e) {
+      log.error("상품 수정 실패", e);
+      model.addAttribute("errorMessage", e.getMessage());
+      model.addAttribute("categories", categoryService.findAllActiveOrSelected(updateDto.getCategorySeq()));
+      model.addAttribute("suppliers", supplierService.findAllActiveOrSelected(updateDto.getSupplierSeq()));
+      return "product/form";
+    }
+  }
+
+  /**
    * 상품 상세 조회
    */
   @GetMapping("/{productSeq}")
@@ -72,7 +155,119 @@ public class ProductController {
     } catch (Exception e) {
       log.error("Failed to get product detail for seq: {}", productSeq, e);
       model.addAttribute("errorMessage", e.getMessage());
-      return "redirect:/products";
+      return "redirect:/product";
+    }
+  }
+
+  /**
+   * 상품 수정 폼
+   */
+  @GetMapping("/{productSeq}/edit")
+  public String editForm(
+          @PathVariable Long productSeq,
+          Model model
+  ) {
+    log.debug("Product edit form request for seq: {}", productSeq);
+
+    try {
+      ProductDto product = productService.findById(productSeq);
+
+      ProductUpdateDto updateDto = ProductUpdateDto.builder()
+              .productSeq(product.getProductSeq())
+              .code(product.getCode())
+              .name(product.getName())
+              .description(product.getDescription())
+              .categorySeq(product.getCategorySeq())
+              .supplierSeq(product.getSupplierSeq())
+              .unitPrice(product.getUnitPrice())
+              .unitCost(product.getUnitCost())
+              .unit(product.getUnit())
+              .sku(product.getSku())
+              .barcode(product.getBarcode())
+              .weight(product.getWeight())
+              .dimensions(product.getDimensions())
+              .status(product.getStatus())
+              .currentImageUrl(product.getImageUrl())
+              .build();
+
+      model.addAttribute("product", updateDto);
+      model.addAttribute("categories", categoryService.findAllActiveOrSelected(product.getCategorySeq()));
+      model.addAttribute("suppliers", supplierService.findAllActiveOrSelected(product.getSupplierSeq()));
+      return "product/form";
+    } catch (Exception e) {
+      log.error("Failed to get product for edit form, seq: {}", productSeq, e);
+      model.addAttribute("errorMessage", e.getMessage());
+      return "redirect:/product";
+    }
+  }
+
+
+  /**
+   * 상품 삭제
+   */
+  @PostMapping("/{productSeq}/delete")
+  public String delete(
+          @PathVariable Long productSeq,
+          RedirectAttributes redirectAttributes
+  ) {
+    log.debug("Deleting product seq: {}", productSeq);
+
+    try {
+      productService.delete(productSeq);
+      redirectAttributes.addFlashAttribute("successMessage", "product.message.delete.success");
+    } catch (Exception e) {
+      log.error("Failed to delete product", e);
+      redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+    }
+
+    return "redirect:/product";
+  }
+
+  /**
+   * 코드 중복 확인 API
+   */
+  @GetMapping("/check-code")
+  @ResponseBody
+  public ResponseEntity<Boolean> checkCodeDuplicate(
+          @RequestParam String code,
+          @RequestParam(required = false) Long excludeSeq
+  ) {
+    boolean isDuplicate;
+    if (excludeSeq != null) {
+      isDuplicate = productService.isCodeDuplicate(code, excludeSeq);
+    } else {
+      isDuplicate = productService.isCodeDuplicate(code);
+    }
+    return ResponseEntity.ok(isDuplicate);
+  }
+
+  /**
+   * 상태별 상품 목록 API
+   */
+  @GetMapping("/by-status/{status}")
+  @ResponseBody
+  public ResponseEntity<Object> getProductsByStatus(@PathVariable String status) {
+    try {
+      return ResponseEntity.ok(productService.findByStatus(status));
+    } catch (Exception e) {
+      log.error("Failed to get products by status: {}", status, e);
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
+  }
+
+  /**
+   * 최근 상품 목록 API
+   */
+  @GetMapping("/recent")
+  @ResponseBody
+  public ResponseEntity<Object> getRecentProducts(
+          @RequestParam(defaultValue = "10") int limit
+  ) {
+    try {
+      return ResponseEntity.ok(productService.findRecentProducts(limit));
+    } catch (Exception e) {
+      log.error("Failed to get recent products", e);
+      return ResponseEntity.badRequest().body(e.getMessage());
     }
   }
 }
