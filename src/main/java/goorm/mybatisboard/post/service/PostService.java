@@ -14,7 +14,4 @@ public interface PostService {
   public Post update(Long seq, PostFormDto postFormDto);
   public void delete(Long seq);
 
-  public PageDto<PostDetailDto> findAllWithConditions(PostSearchConditionDto condition);
-  public List<CategoryDto> findAllCategories();
-  public List<CategoryDto> findActiveCategories();
 }

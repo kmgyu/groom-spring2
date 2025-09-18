@@ -1,139 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="goorm.mybatisboard.mapper.CategoryMapper">
+<mapper namespace="goorm.mybatisboard.product.mapper.CategoryMapper">
 
-    <!-- ========== 검색 쿼리 ========== -->
+    <!-- CategoryDto ResultMap -->
+    <resultMap id="categoryResultMap" type="goorm.mybatisboard.product.dto.CategoryDto">
+        <id property="categorySeq" column="category_seq"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="status" column="is_active" typeHandler="org.apache.ibatis.type.BooleanTypeHandler"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdSeq" column="created_seq"/>
+        <result property="updatedSeq" column="updated_seq"/>
+    </resultMap>
 
-    <!-- 검색 조건에 따른 카테고리 목록 조회 -->
-    <select id="findAllWithConditions" parameterType="goorm.mybatisboard.post.dto.SearchConditionDto"
-            resultType="goorm.mybatisboard.post.dto.CategoryDto">
+    <!-- 활성 카테고리 목록 조회 -->
+    <select id="findAllActive" resultMap="categoryResultMap">
         SELECT
-        id,
-        name,
-        description,
-        display_order,
-        is_active,
-        created_at,
-        updated_at
-        FROM categories c
-
-        <where>
-            <!-- 키워드 검색 -->
-            <if test="keyword != null and keyword.trim() != ''">
-                AND (
-                <choose>
-                    <when test="searchType == 'name'">
-                        LOWER(c.name) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
-                    </when>
-                    <when test="searchType == 'description'">
-                        LOWER(c.description) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
-                    </when>
-                    <otherwise>
-                        (LOWER(c.name) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
-                        OR LOWER(c.description) LIKE LOWER(CONCAT('%', #{keyword}, '%')))
-                    </otherwise>
-                </choose>
-                )
-            </if>
-
-            <!-- 활성 상태 필터 -->
-            <if test="isActive != null">
-                AND c.is_active = #{isActive}
-            </if>
-
-        </where>
-
-        <!-- 동적 정렬 -->
-        ORDER BY
-        <choose>
-            <when test="sortBy == 'name' and sortDirection == 'ASC'">
-                c.name ASC
-            </when>
-            <when test="sortBy == 'name' and sortDirection == 'DESC'">
-                c.name DESC
-            </when>
-            <when test="sortBy == 'created_at' and sortDirection == 'ASC'">
-                c.created_at ASC
-            </when>
-            <when test="sortBy == 'created_at' and sortDirection == 'DESC'">
-                c.created_at DESC
-            </when>
-            <when test="sortDirection == 'DESC'">
-                c.display_order DESC
-            </when>
-            <otherwise>
-                c.display_order ASC
-            </otherwise>
-        </choose>
-        LIMIT #{offset}, #{size}
-    </select>
-
-    <!-- 검색 조건에 따른 카테고리 총 개수 -->
-    <select id="countAllWithConditions" parameterType="goorm.mybatisboard.post.dto.SearchConditionDto"
-            resultType="int">
-        SELECT COUNT(*)
-        FROM categories c
-
-        <where>
-            <!-- 키워드 검색 -->
-            <if test="keyword != null and keyword.trim() != ''">
-                AND (
-                <choose>
-                    <when test="searchType == 'name'">
-                        LOWER(c.name) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
-                    </when>
-                    <when test="searchType == 'description'">
-                        LOWER(c.description) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
-                    </when>
-                    <otherwise>
-                        (LOWER(c.name) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
-                        OR LOWER(c.description) LIKE LOWER(CONCAT('%', #{keyword}, '%')))
-                    </otherwise>
-                </choose>
-                )
-            </if>
-
-            <!-- 활성 상태 필터 -->
-            <if test="isActive != null">
-                AND c.is_active = #{isActive}
-            </if>
-
-        </where>
-    </select>
-
-    <!-- ========== 기본 CRUD ========== -->
-
-    <!-- 모든 카테고리 조회 (페이징) -->
-    <select id="findAll" resultType="goorm.mybatisboard.post.dto.CategoryDto">
-        SELECT
-            id, name, description, display_order, is_active, created_at, updated_at
-        FROM categories
-        ORDER BY display_order, name
-        LIMIT #{offset}, #{size}
-    </select>
-
-    <!-- 활성 카테고리만 조회 -->
-    <select id="findActiveCategories" resultType="goorm.mybatisboard.post.dto.CategoryDto">
-        SELECT
-            id,
+            category_seq,
             name,
             description,
-            display_order,
+            sort_order,
             is_active,
             created_at,
-            updated_at
+            updated_at,
+            created_seq,
+            updated_seq
         FROM categories
         WHERE is_active = TRUE
-        ORDER BY display_order, name
+        ORDER BY sort_order ASC, name ASC
     </select>
 
-
-    <!-- 전체 카테고리 수 -->
-    <select id="countAll" resultType="int">
-        SELECT COUNT(*)
+    <!-- 수정용 카테고리 목록 조회 (활성 + 현재 선택된 카테고리) -->
+    <select id="findAllActiveOrSelected" parameterType="long" resultMap="categoryResultMap">
+        SELECT
+        category_seq,
+        name,
+        description,
+        sort_order,
+        is_active,
+        created_at,
+        updated_at,
+        created_seq,
+        updated_seq
         FROM categories
+        WHERE is_active = TRUE
+        <if test="selectedCategorySeq != null">
+            OR category_seq = #{selectedCategorySeq}
+        </if>
+        ORDER BY sort_order ASC, name ASC
+    </select>
+
+    <!-- 카테고리 상세 조회 -->
+    <select id="findBySeq" parameterType="long" resultMap="categoryResultMap">
+        SELECT
+            category_seq,
+            name,
+            description,
+            sort_order,
+            is_active,
+            created_at,
+            updated_at,
+            created_seq,
+            updated_seq
+        FROM categories
+        WHERE category_seq = #{categorySeq}
     </select>
 
 </mapper>

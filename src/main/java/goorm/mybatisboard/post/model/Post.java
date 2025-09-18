@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ToString
 public class Post {
     
-    private Long id;
+    private Long seq;
     private String title;
     private String content;
     private LocalDateTime createdAt;

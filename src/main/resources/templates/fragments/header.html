@@ -8,8 +8,10 @@
         <nav class="space-x-4 flex items-center">
             <a th:href="@{/posts}" class="px-4 py-2 text-gray-600 hover:text-blue-600 font-medium">게시판</a>
             <!-- 로그인된 사용자만 글쓰기 버튼 표시 -->
-            <a sec:authorize="isAuthenticated()" th:href="@{/posts/new}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium">글쓰기</a>
 
+            <a th:href="@{/post}" class="px-4 py-2 text-gray-600 hover:text-blue-600 font-medium" th:text="#{nav.posts}">게시판</a>
+            <a th:href="@{/product}" class="px-4 py-2 text-gray-600 hover:text-blue-600 font-medium" th:text="#{nav.products}">제품</a>
+<!--            <a th:href="@{/categories}" class="px-4 py-2 text-gray-600 hover:text-blue-600 font-medium" th:text="#{nav.}">카테고리관리</a>-->
             <!-- 로그인하지 않은 경우 -->
             <div sec:authorize="isAnonymous()" class="space-x-4">
                 <a th:href="@{/auth/signup}" class="px-4 py-2 text-gray-600 hover:text-blue-600 font-medium">회원가입</a>

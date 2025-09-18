@@ -25,7 +25,7 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userSeq;
 
     @Email(message = "{validation.email.invalid}")
     @NotBlank(message = "{validation.email.required}")

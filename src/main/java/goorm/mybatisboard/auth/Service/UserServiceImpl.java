@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserDetailsService {
         user.setNickname(signupDTO.getNickname());
 
         User savedUser = userRepository.save(user);
-        log.info("회원가입 성공: email={}, userId={}", signupDTO.getEmail(), savedUser.getId());
+        log.info("회원가입 성공: email={}, userId={}", signupDTO.getEmail(), savedUser.getUserSeq());
         return savedUser;
     }
 
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserDetailsService {
             throw new InvalidCredentialsException(loginDTO.getEmail());
         }
 
-        log.info("로그인 성공: email={}, userId={}", loginDTO.getEmail(), user.getId());
+        log.info("로그인 성공: email={}, userId={}", loginDTO.getEmail(), user.getUserSeq());
         return user;
     }
 

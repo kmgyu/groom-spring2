@@ -134,7 +134,7 @@ public class MyBatisPostServiceImpl implements PostService{
     
     private PostListDto convertToListDto(Post post) {
         PostListDto dto = new PostListDto();
-        dto.setId(post.getId());
+        dto.setId(post.getSeq());
         dto.setTitle(post.getTitle());
         dto.setCreatedAt(post.getCreatedAt());
 
@@ -150,32 +150,4 @@ public class MyBatisPostServiceImpl implements PostService{
     }
 
     // ========== 통합 검색 시스템 ==========
-
-    public PageDto<PostDetailDto> findAllWithConditions(PostSearchConditionDto condition) {
-        log.debug("Finding posts with integrated search conditions: {}", condition.toString());
-
-//        condition.validateAndCorrect();
-
-        int totalElements = postMapper.countAllWithConditions(condition);
-        log.debug("Total posts count with conditions: {}", totalElements);
-
-        List<PostDetailDto> posts = postMapper.findAllWithConditions(condition);
-        log.debug("Found {} posts for page {}", posts.size(), condition.getPage());
-
-        return PageDto.of(posts, condition.getPage(), condition.getSize(), totalElements);
-    }
-
-    public List<CategoryDto> findAllCategories() {
-        log.debug("Finding all categories");
-        List<CategoryDto> categories = postMapper.findAllCategories();
-        log.debug("Found {} categories", categories.size());
-        return categories;
-    }
-
-    public List<CategoryDto> findActiveCategories() {
-        log.debug("Finding active categories");
-        List<CategoryDto> categories = postMapper.findActiveCategories();
-        log.debug("Found {} active categories", categories.size());
-        return categories;
-    }
 }
