@@ -8,9 +8,12 @@
         <id property="categorySeq" column="category_seq"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
-        <result property="parentCategorySeq" column="parent_category_seq"/>
         <result property="sortOrder" column="sort_order"/>
-        <result property="isActive" column="is_active"/>
+        <result property="status" column="is_active" typeHandler="org.apache.ibatis.type.BooleanTypeHandler"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdSeq" column="created_seq"/>
+        <result property="updatedSeq" column="updated_seq"/>
     </resultMap>
 
     <!-- 활성 카테고리 목록 조회 -->
@@ -19,9 +22,12 @@
             category_seq,
             name,
             description,
-            parent_category_seq,
             sort_order,
-            is_active
+            is_active,
+            created_at,
+            updated_at,
+            created_seq,
+            updated_seq
         FROM categories
         WHERE is_active = TRUE
         ORDER BY sort_order ASC, name ASC
@@ -30,16 +36,19 @@
     <!-- 수정용 카테고리 목록 조회 (활성 + 현재 선택된 카테고리) -->
     <select id="findAllActiveOrSelected" parameterType="long" resultMap="categoryResultMap">
         SELECT
-            category_seq,
-            name,
-            description,
-            parent_category_seq,
-            sort_order,
-            is_active
+        category_seq,
+        name,
+        description,
+        sort_order,
+        is_active,
+        created_at,
+        updated_at,
+        created_seq,
+        updated_seq
         FROM categories
         WHERE is_active = TRUE
         <if test="selectedCategorySeq != null">
-           OR category_seq = #{selectedCategorySeq}
+            OR category_seq = #{selectedCategorySeq}
         </if>
         ORDER BY sort_order ASC, name ASC
     </select>
@@ -50,9 +59,12 @@
             category_seq,
             name,
             description,
-            parent_category_seq,
             sort_order,
-            is_active
+            is_active,
+            created_at,
+            updated_at,
+            created_seq,
+            updated_seq
         FROM categories
         WHERE category_seq = #{categorySeq}
     </select>
