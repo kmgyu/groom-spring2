@@ -6,6 +6,7 @@ import goorm.mybatisboard.product.dto.ProductDto;
 import goorm.mybatisboard.product.dto.ProductSearchDto;
 import goorm.mybatisboard.product.dto.ProductUpdateDto;
 import goorm.mybatisboard.product.service.CategoryService;
+import goorm.mybatisboard.product.service.ExcelExportService;
 import goorm.mybatisboard.product.service.ProductService;
 import goorm.mybatisboard.product.service.SupplierService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +35,7 @@ public class ProductController {
   private final SupplierService supplierService;
   private final MessageSource messageSource;
   private final LocaleResolver localeResolver;
+  private final ExcelExportService excelExportService;
 
   /**
    * 상품 목록 조회
@@ -270,4 +274,35 @@ public class ProductController {
       return ResponseEntity.badRequest().body(e.getMessage());
     }
   }
+
+  /**
+  * 상품 목록 Excel 다운로드
+  */
+  @GetMapping("/excel")
+  public ResponseEntity<byte[]> downloadExcel(@ModelAttribute ProductSearchDto searchDto, HttpServletRequest request) {
+    try {
+      log.debug("Excel download request with search: {}", searchDto);
+
+      // 서비스에서 Excel 데이터 생성
+      byte[] excelData = productService.exportToExcel(searchDto);
+
+      // 파일명 생성 (한글 지원)
+      String fileName = excelExportService.generateFileName("상품목록", localeResolver.resolveLocale(request));
+
+      // HTTP 헤더 설정
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+      headers.setContentDispositionFormData("attachment", fileName);
+
+      return ResponseEntity.ok()
+              .headers(headers)
+              .body(excelData);
+
+    } catch (Exception e) {
+      log.error("Failed to download Excel", e);
+      return ResponseEntity.internalServerError().build();
+    }
+  }
+
+
 }
