@@ -1,7 +1,7 @@
 package goorm.mybatisboard.post.exception;
 
 public class PostNotFoundException extends RuntimeException {
-  private final long postId;
+  private final Long postId;
 
   public PostNotFoundException(String message) {
     super("Post Not Found" + message);
