@@ -13,7 +13,7 @@
         <result property="createdAt" column="created_at"/>
 
         <!-- User 연관관계 매핑 -->
-        <association property="author" javaType="io.goorm.board.entity.User">
+        <association property="author" javaType="goorm.mybatisboard.auth.User">
             <id property="userSeq" column="user_seq"/>
             <result property="email" column="user_email"/>
             <result property="nickname" column="user_nickname"/>
