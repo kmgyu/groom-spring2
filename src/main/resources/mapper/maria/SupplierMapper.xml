@@ -46,7 +46,6 @@
     </select>
 
     <!-- 공급업체 상세 조회 -->
-    <select id="findBySeq" parameterType="long" resultMap="supplierResultMap">
     <select id="findAllActiveOrSelected" resultMap="supplierDtoResultMap">
         SELECT <include refid="supplierDtoColumns"/>
         FROM suppliers s

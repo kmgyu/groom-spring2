@@ -1,8 +1,6 @@
 package goorm.mybatisboard.auth;
 
-import goorm.mybatisboard.auth.Service.MyBatisUserServiceImpl;
 import goorm.mybatisboard.auth.Service.UserService;
-import goorm.mybatisboard.auth.Service.UserServiceImpl;
 import goorm.mybatisboard.auth.dto.LoginDto;
 import goorm.mybatisboard.auth.dto.ProfileUpdateDto;
 import goorm.mybatisboard.auth.dto.SignupDto;

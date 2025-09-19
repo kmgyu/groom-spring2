@@ -2,9 +2,11 @@ package goorm.mybatisboard.auth;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.context.annotation.Profile;
 
 import java.util.Optional;
 
+@Profile("mybatis")
 @Mapper
 public interface UserMapper {
     
