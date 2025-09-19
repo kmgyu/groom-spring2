@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>카테고리 관리 - 등록/수정</title>
+    <title>공급업체 관리 - 등록/수정</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- 헤더 -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900" id="pageTitle">카테고리 등록</h1>
-            <p class="mt-2 text-sm text-gray-600" id="pageDescription">새로운 카테고리를 등록합니다.</p>
+            <h1 class="text-3xl font-bold text-gray-900" id="pageTitle">공급업체 등록</h1>
+            <p class="mt-2 text-sm text-gray-600" id="pageDescription">새로운 공급업체를 등록합니다.</p>
         </div>
 
         <!-- 에러 메시지 -->
@@ -24,30 +24,49 @@
             <div class="text-green-800">성공적으로 처리되었습니다.</div>
         </div>
 
-        <!-- 카테고리 등록/수정 폼 -->
-        <form id="categoryForm" class="space-y-8" onsubmit="handleFormSubmit(event)">
+        <!-- 공급업체 등록/수정 폼 -->
+        <form id="supplierForm" class="space-y-8" onsubmit="handleFormSubmit(event)">
             <!-- 기본 정보 -->
             <div class="bg-white rounded-lg shadow p-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-6">기본 정보</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- 카테고리명 -->
+                    <!-- 업체명 -->
                     <div class="md:col-span-2">
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                            카테고리명 <span class="text-red-500">*</span>
+                            업체명 <span class="text-red-500">*</span>
                         </label>
                         <input type="text" id="name" name="name" required
-                               placeholder="카테고리명을 입력하세요"
+                               placeholder="업체명을 입력하세요"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <div id="nameError" class="mt-1 text-sm text-red-600 hidden">카테고리명을 입력해주세요.</div>
+                        <div id="nameError" class="mt-1 text-sm text-red-600 hidden">업체명을 입력해주세요.</div>
                     </div>
 
-                    <!-- 정렬순서 -->
+                    <!-- 담당자명 -->
                     <div>
-                        <label for="sortOrder" class="block text-sm font-medium text-gray-700 mb-2">정렬순서</label>
-                        <input type="number" id="sortOrder" name="sortOrder" min="0" value="0"
+                        <label for="contactPerson" class="block text-sm font-medium text-gray-700 mb-2">담당자명</label>
+                        <input type="text" id="contactPerson" name="contactPerson"
+                               placeholder="담당자명을 입력하세요"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <div class="mt-1 text-sm text-gray-500">작은 번호일수록 앞에 표시됩니다.</div>
+                        <div id="contactPersonError" class="mt-1 text-sm text-red-600 hidden">담당자명이 너무 깁니다.</div>
+                    </div>
+
+                    <!-- 전화번호 -->
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
+                        <input type="tel" id="phone" name="phone"
+                               placeholder="02-1234-5678"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div id="phoneError" class="mt-1 text-sm text-red-600 hidden">전화번호 형식이 올바르지 않습니다.</div>
+                    </div>
+
+                    <!-- 이메일 -->
+                    <div class="md:col-span-2">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                        <input type="email" id="email" name="email"
+                               placeholder="contact@company.com"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div id="emailError" class="mt-1 text-sm text-red-600 hidden">이메일 형식이 올바르지 않습니다.</div>
                     </div>
 
                     <!-- 상태 (수정시에만 표시) -->
@@ -61,11 +80,20 @@
                         <div class="mt-1 text-sm text-gray-500">상태는 목록에서 변경할 수 있습니다.</div>
                     </div>
 
-                    <!-- 카테고리 설명 -->
+                    <!-- 주소 -->
                     <div class="md:col-span-2">
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">카테고리 설명</label>
+                        <label for="address" class="block text-sm font-medium text-gray-700 mb-2">주소</label>
+                        <textarea id="address" name="address" rows="2"
+                                  placeholder="업체 주소를 입력하세요"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <div id="addressError" class="mt-1 text-sm text-red-600 hidden">주소가 너무 깁니다.</div>
+                    </div>
+
+                    <!-- 업체 설명 -->
+                    <div class="md:col-span-2">
+                        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">업체 설명</label>
                         <textarea id="description" name="description" rows="4"
-                                  placeholder="카테고리에 대한 설명을 입력하세요"
+                                  placeholder="업체에 대한 설명을 입력하세요"
                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                         <div id="descriptionError" class="mt-1 text-sm text-red-600 hidden">설명이 너무 깁니다.</div>
                     </div>
@@ -90,7 +118,7 @@
     <script>
         // 페이지 모드 (create/edit)
         let isEditMode = false;
-        let categoryId = null;
+        let supplierId = null;
 
         // URL에서 edit 모드 확인 (실제로는 서버에서 처리)
         function checkEditMode() {
@@ -99,11 +127,11 @@
 
             if (id) {
                 isEditMode = true;
-                categoryId = id;
+                supplierId = id;
 
                 // 페이지 제목 변경
-                document.getElementById('pageTitle').textContent = '카테고리 수정';
-                document.getElementById('pageDescription').textContent = '카테고리 정보를 수정합니다.';
+                document.getElementById('pageTitle').textContent = '공급업체 수정';
+                document.getElementById('pageDescription').textContent = '공급업체 정보를 수정합니다.';
                 document.getElementById('submitBtn').textContent = '수정';
 
                 // 상태 필드 표시
@@ -116,10 +144,21 @@
 
         // 샘플 데이터 로드
         function loadSampleData() {
-            if (categoryId === '1') {
-                document.getElementById('name').value = '전자제품';
-                document.getElementById('description').value = '컴퓨터, 스마트폰, 가전제품 등';
-                document.getElementById('sortOrder').value = '1';
+            if (supplierId === '1') {
+                document.getElementById('name').value = '삼성전자';
+                document.getElementById('contactPerson').value = '김삼성';
+                document.getElementById('email').value = 'contact@samsung.com';
+                document.getElementById('phone').value = '02-1234-5678';
+                document.getElementById('address').value = '서울특별시 강남구';
+                document.getElementById('description').value = '전자제품 공급업체';
+                document.getElementById('status').value = 'ACTIVE';
+            } else if (supplierId === '2') {
+                document.getElementById('name').value = 'LG전자';
+                document.getElementById('contactPerson').value = '이엘지';
+                document.getElementById('email').value = 'contact@lg.com';
+                document.getElementById('phone').value = '02-2345-6789';
+                document.getElementById('address').value = '서울특별시 서초구';
+                document.getElementById('description').value = '가전제품 공급업체';
                 document.getElementById('status').value = 'ACTIVE';
             }
         }
@@ -140,7 +179,7 @@
             console.log('전송할 데이터:', data);
 
             // 성공 메시지 표시
-            showSuccessMessage(isEditMode ? '카테고리가 성공적으로 수정되었습니다.' : '카테고리가 성공적으로 등록되었습니다.');
+            showSuccessMessage(isEditMode ? '공급업체가 성공적으로 수정되었습니다.' : '공급업체가 성공적으로 등록되었습니다.');
 
             // 3초 후 목록으로 이동
             setTimeout(() => {
@@ -152,35 +191,79 @@
         function validateForm() {
             let isValid = true;
 
-            // 카테고리명 검사
+            // 업체명 검사
             const name = document.getElementById('name').value.trim();
             const nameError = document.getElementById('nameError');
 
             if (!name) {
-                nameError.textContent = '카테고리명을 입력해주세요.';
+                nameError.textContent = '업체명을 입력해주세요.';
                 nameError.classList.remove('hidden');
                 isValid = false;
             } else if (name.length > 100) {
-                nameError.textContent = '카테고리명은 100자 이하로 입력해주세요.';
+                nameError.textContent = '업체명은 100자 이하로 입력해주세요.';
                 nameError.classList.remove('hidden');
                 isValid = false;
             } else {
                 nameError.classList.add('hidden');
             }
 
-            // 설명 검사
-            const description = document.getElementById('description').value.trim();
-            const descriptionError = document.getElementById('descriptionError');
+            // 담당자명 검사
+            const contactPerson = document.getElementById('contactPerson').value.trim();
+            const contactPersonError = document.getElementById('contactPersonError');
 
-            if (description.length > 500) {
-                descriptionError.textContent = '설명은 500자 이하로 입력해주세요.';
-                descriptionError.classList.remove('hidden');
+            if (contactPerson.length > 50) {
+                contactPersonError.textContent = '담당자명은 50자 이하로 입력해주세요.';
+                contactPersonError.classList.remove('hidden');
                 isValid = false;
             } else {
-                descriptionError.classList.add('hidden');
+                contactPersonError.classList.add('hidden');
+            }
+
+            // 이메일 검사
+            const email = document.getElementById('email').value.trim();
+            const emailError = document.getElementById('emailError');
+
+            if (email && !isValidEmail(email)) {
+                emailError.textContent = '올바른 이메일 주소를 입력해주세요.';
+                emailError.classList.remove('hidden');
+                isValid = false;
+            } else if (email.length > 255) {
+                emailError.textContent = '이메일은 255자 이하로 입력해주세요.';
+                emailError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                emailError.classList.add('hidden');
+            }
+
+            // 전화번호 검사
+            const phone = document.getElementById('phone').value.trim();
+            const phoneError = document.getElementById('phoneError');
+
+            if (phone && !isValidPhone(phone)) {
+                phoneError.textContent = '올바른 전화번호 형식을 입력해주세요. (예: 02-1234-5678)';
+                phoneError.classList.remove('hidden');
+                isValid = false;
+            } else if (phone.length > 20) {
+                phoneError.textContent = '전화번호는 20자 이하로 입력해주세요.';
+                phoneError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                phoneError.classList.add('hidden');
             }
 
             return isValid;
+        }
+
+        // 이메일 유효성 검사
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // 전화번호 유효성 검사
+        function isValidPhone(phone) {
+            const phoneRegex = /^[\d\-\+\(\)\s]+$/;
+            return phoneRegex.test(phone);
         }
 
         // 에러 메시지 표시
