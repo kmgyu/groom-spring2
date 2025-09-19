@@ -10,6 +10,7 @@ import goorm.mybatisboard.auth.exception.InvalidCredentialsException;
 import goorm.mybatisboard.auth.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +30,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
+    @Lazy
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -53,26 +55,31 @@ public class UserServiceImpl implements UserDetailsService {
 //        // User 생성 및 저장...
 //    }
 
-    public User signup(SignupDto signupDTO) {
+    public User signup(SignupDto signupDto) {
+        log.info("회원가입 시도: email={}", signupDto.getEmail());
+
         // 이메일 중복 검사
-        if (userRepository.existsByEmail(signupDTO.getEmail())) {
-            throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
+        if (userRepository.existsByEmail(signupDto.getEmail())) {
+            log.warn("회원가입 실패 - 이메일 중복: email={}", signupDto.getEmail());
+            throw new DuplicateEmailException(signupDto.getEmail());
         }
 
         // 비밀번호 확인 검사
-        if (!signupDTO.getPassword().equals(signupDTO.getPasswordConfirm())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        if (!signupDto.getPassword().equals(signupDto.getPasswordConfirm())) {
+            log.warn("회원가입 실패 - 비밀번호 불일치: email={}", signupDto.getEmail());
+            throw new IllegalArgumentException("Password mismatch");
         }
+
 
         // 사용자 엔티티 생성
         User user = new User();
-        user.setEmail(signupDTO.getEmail());
-        String encodedPassword = passwordEncoder.encode(signupDTO.getPassword());
+        user.setEmail(signupDto.getEmail());
+        String encodedPassword = passwordEncoder.encode(signupDto.getPassword());
         user.setPassword(encodedPassword);
-        user.setNickname(signupDTO.getNickname());
+        user.setNickname(signupDto.getNickname());
 
         User savedUser = userRepository.save(user);
-        log.info("회원가입 성공: email={}, userId={}", signupDTO.getEmail(), savedUser.getUserSeq());
+        log.info("회원가입 성공: email={}, userId={}", signupDto.getEmail(), savedUser.getUserSeq());
         return savedUser;
     }
 
