@@ -1,4 +1,4 @@
-package goorm.mybatisboard.stock.category;
+package goorm.mybatisboard.stock.category.service;
 
 
 import goorm.mybatisboard.stock.category.dto.*;

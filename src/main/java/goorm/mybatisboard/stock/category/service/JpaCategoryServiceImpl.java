@@ -1,5 +1,8 @@
-package goorm.mybatisboard.stock.category;
+package goorm.mybatisboard.stock.category.service;
 
+import goorm.mybatisboard.stock.category.Category;
+import goorm.mybatisboard.stock.category.CategoryRepository;
+import goorm.mybatisboard.stock.category.CategoryStatus;
 import goorm.mybatisboard.stock.category.dto.*;
 import goorm.mybatisboard.stock.ExcelExportService;
 import goorm.mybatisboard.stock.category.exception.*;
@@ -223,7 +226,7 @@ public class JpaCategoryServiceImpl implements CategoryService {
                 .name(category.getName())
                 .description(category.getDescription())
                 .sortOrder(category.getSortOrder())
-                .status(category.getStatus())
+                .isActive(category.getIsActive())
                 .createdAt(category.getCreatedAt())
                 .updatedAt(category.getUpdatedAt())
                 .build();
