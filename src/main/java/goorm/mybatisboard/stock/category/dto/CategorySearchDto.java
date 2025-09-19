@@ -26,14 +26,14 @@ public class CategorySearchDto extends BaseSearchConditionDto {
 
     @Override
     public boolean isEmpty() {
-        return !hasKeyword() && status == null;
+        return !hasKeyword() && !hasStatus();
     }
 
     /**
      * 검색 조건 존재 여부 확인
      */
     public boolean hasSearchCondition() {
-        return hasKeyword() || status != null;
+        return hasKeyword() || hasStatus();
     }
 
 }
