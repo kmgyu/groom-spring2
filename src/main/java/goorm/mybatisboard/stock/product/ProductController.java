@@ -6,7 +6,7 @@ import goorm.mybatisboard.stock.product.dto.ProductSearchDto;
 import goorm.mybatisboard.stock.product.dto.ProductUpdateDto;
 import goorm.mybatisboard.stock.category.service.CategoryService;
 import goorm.mybatisboard.stock.ExcelExportService;
-import goorm.mybatisboard.stock.supplier.SupplierService;
+import goorm.mybatisboard.stock.supplier.service.SupplierService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

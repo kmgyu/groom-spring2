@@ -1,6 +1,7 @@
-package goorm.mybatisboard.stock.supplier;
+package goorm.mybatisboard.stock.supplier.service;
 
 import goorm.mybatisboard.stock.product.dto.SupplierDto;
+import goorm.mybatisboard.stock.supplier.SupplierMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

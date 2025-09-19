@@ -1,4 +1,4 @@
-package goorm.mybatisboard.stock.supplier;
+package goorm.mybatisboard.stock.supplier.service;
 
 
 import goorm.mybatisboard.stock.product.dto.SupplierDto;
