@@ -5,6 +5,7 @@ import goorm.mybatisboard.stock.category.dto.CategoryCreateDto;
 import goorm.mybatisboard.stock.category.dto.CategoryDto;
 import goorm.mybatisboard.stock.category.dto.CategorySearchDto;
 import goorm.mybatisboard.stock.category.dto.CategoryUpdateDto;
+import goorm.mybatisboard.stock.category.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

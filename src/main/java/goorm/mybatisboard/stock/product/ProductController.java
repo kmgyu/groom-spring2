@@ -4,7 +4,7 @@ import goorm.mybatisboard.stock.product.dto.ProductCreateDto;
 import goorm.mybatisboard.stock.product.dto.ProductDto;
 import goorm.mybatisboard.stock.product.dto.ProductSearchDto;
 import goorm.mybatisboard.stock.product.dto.ProductUpdateDto;
-import goorm.mybatisboard.stock.category.CategoryService;
+import goorm.mybatisboard.stock.category.service.CategoryService;
 import goorm.mybatisboard.stock.ExcelExportService;
 import goorm.mybatisboard.stock.supplier.SupplierService;
 import jakarta.servlet.http.HttpServletRequest;
