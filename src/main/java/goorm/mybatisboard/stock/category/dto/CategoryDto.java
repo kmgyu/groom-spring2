@@ -1,6 +1,6 @@
 package goorm.mybatisboard.stock.category.dto;
 
-import io.goorm.board.enums.CategoryStatus;
+import goorm.mybatisboard.stock.category.CategoryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,7 +1,7 @@
 package goorm.mybatisboard.stock.category.dto;
 
-import io.goorm.board.dto.common.BaseSearchConditionDto;
-import io.goorm.board.enums.CategoryStatus;
+import goorm.mybatisboard.common.dto.BaseSearchConditionDto;
+import goorm.mybatisboard.stock.category.CategoryStatus;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -16,6 +16,13 @@ import lombok.experimental.SuperBuilder;
 public class CategorySearchDto extends BaseSearchConditionDto {
 
     private CategoryStatus status;
+
+    /**
+     * 상태 필터 여부 확인
+     */
+    public boolean hasStatus() {
+        return status != null;
+    }
 
     @Override
     public boolean isEmpty() {

@@ -1,12 +1,10 @@
 package goorm.mybatisboard.stock.category;
 
-import io.goorm.board.dto.category.CategoryCreateDto;
-import io.goorm.board.dto.category.CategoryDto;
-import io.goorm.board.dto.category.CategorySearchDto;
-import io.goorm.board.dto.category.CategoryUpdateDto;
-import io.goorm.board.enums.CategoryStatus;
-import io.goorm.board.service.CategoryService;
-import io.goorm.board.service.ExcelExportService;
+import goorm.mybatisboard.stock.ExcelExportService;
+import goorm.mybatisboard.stock.category.dto.CategoryCreateDto;
+import goorm.mybatisboard.stock.category.dto.CategoryDto;
+import goorm.mybatisboard.stock.category.dto.CategorySearchDto;
+import goorm.mybatisboard.stock.category.dto.CategoryUpdateDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

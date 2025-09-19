@@ -1,7 +1,7 @@
 package goorm.mybatisboard.stock.category;
 
 
-import goorm.mybatisboard.stock.category.dto.CategoryDto;
+import goorm.mybatisboard.stock.category.dto.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
