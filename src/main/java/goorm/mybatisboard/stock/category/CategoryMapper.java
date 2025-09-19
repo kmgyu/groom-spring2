@@ -4,12 +4,14 @@ import goorm.mybatisboard.stock.category.dto.CategoryDto;
 import goorm.mybatisboard.stock.category.dto.CategorySearchDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
 /**
  * 카테고리 매퍼
  */
+@Profile("mybatis")
 @Mapper
 public interface CategoryMapper {
 
