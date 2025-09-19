@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="goorm.mybatisboard.product.mapper.CategoryMapper">
+<mapper namespace="goorm.mybatisboard.stock.category.CategoryMapper">
 
     <!-- CategoryDto ResultMap -->
-    <resultMap id="categoryResultMap" type="goorm.mybatisboard.product.dto.CategoryDto">
+    <resultMap id="categoryResultMap" type="goorm.mybatisboard.stock.category.dto.CategoryDto">
         <id property="categorySeq" column="category_seq"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>

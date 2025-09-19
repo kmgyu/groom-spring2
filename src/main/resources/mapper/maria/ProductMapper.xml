@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="goorm.mybatisboard.product.mapper.ProductMapper">
+<mapper namespace="goorm.mybatisboard.stock.product.ProductMapper">
 
     <!-- Entity Result Map -->
-    <resultMap id="productResultMap" type="goorm.mybatisboard.product.model.Product">
+    <resultMap id="productResultMap" type="goorm.mybatisboard.stock.product.Product">
         <id property="productSeq" column="product_seq"/>
         <result property="code" column="code"/>
         <result property="name" column="name"/>
@@ -28,7 +28,7 @@
     </resultMap>
 
     <!-- DTO Result Map -->
-    <resultMap id="productDtoResultMap" type="goorm.mybatisboard.product.dto.ProductDto">
+    <resultMap id="productDtoResultMap" type="goorm.mybatisboard.stock.product.dto.ProductDto">
         <id property="productSeq" column="product_seq"/>
         <result property="code" column="code"/>
         <result property="name" column="name"/>
@@ -144,7 +144,7 @@
     </sql>
 
     <!-- 상품 등록 -->
-    <insert id="insert" parameterType="goorm.mybatisboard.product.model.Product"
+    <insert id="insert" parameterType="goorm.mybatisboard.stock.product.Product"
             useGeneratedKeys="true" keyProperty="productSeq">
         INSERT INTO products (
             code, name, description, category_seq, supplier_seq,
@@ -158,7 +158,7 @@
     </insert>
 
     <!-- 상품 수정 -->
-    <update id="update" parameterType="goorm.mybatisboard.product.model.Product">
+    <update id="update" parameterType="goorm.mybatisboard.stock.product.Product">
         UPDATE products SET
             code = #{code},
             name = #{name},
